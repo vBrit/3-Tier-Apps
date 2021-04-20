@@ -11,14 +11,14 @@ Common:
 
 Target:
   vCenter:                                                                    # Settings used when "vCenter" deployment is chosen (TargetConfig.Deployment == "vCenter")
-    FQDN: vcenter.mgmt.wei-lab.com                                            # FQDN - The FQDN to your physical vCenter Server
-    User: sddclab@vsphere.local                                               # User - vCenter Server user account.  We suggest you create a dedicate account for deployments, such as SDDCLab@vsphere.local
+    FQDN: FQDN                                                                # FQDN - The FQDN to your physical vCenter Server
+    User: user@vsphere.local                                                  # User - vCenter Server user account.  We suggest you create a dedicate account for deployments, such as SDDCLab@vsphere.local
     Password: "{{ Common.Password.Physical }}"                                # Password - Password used by User to authenticate to the physical vCenter Server
     vSwitch: SDDCLab_vDS                                                      # vSwitch - Name of the vDS which is automatically provisioned by the playbooks, and where all the Pod Port-Groups are crated
     vSwitchVersion: 6.6.0                                                     # vSwitchVersion - vDS version used for the given vSwitch
     DataCenter: SDDC                                                          # DataCenter - Defines under which DataCenter object the lab Pod's are deployed
-    Cluster: Lab-Cluster                                                      # Cluster - Defines which vSphere cluster within DataCenter the lab Pod's are deployed
-    Datastore: "NMB-1"                                                        # Datastore - Defines Which datastore should the nested lab Pod VMs be placed
+    Cluster: Cluster                                                          # Cluster - Defines which vSphere cluster within DataCenter the lab Pod's are deployed
+    Datastore: "DataStore"                                                    # Datastore - Defines Which datastore should the nested lab Pod VMs be placed
     PortGroup:                                                                # Various PortGroups used during deployment
       Web: "SEG-Web"                                                          # SEG-Web - PortGroup which the Web Servers will attach to
       App: "SEG-App"                                                          # SEG-App - PortGroup which the App Server will attach to
