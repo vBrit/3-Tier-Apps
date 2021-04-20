@@ -1,0 +1,7 @@
+.vscode
+target-vcenter.yml
+app-01a-10-static-eth0.network
+db-01a-10-static-eth0.network
+web-01a-10-static-eth0.network
+web-02a-10-static-eth0.network
+web-03a-10-static-eth0.network
