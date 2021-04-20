@@ -3,11 +3,11 @@ ova_config:
   - name: web-01a
     ip: "192.168.{{Common.SiteCode + 1}}.10"
     subnet_mask_bits: 24
-    gateway: "{{ Common.Network.SEGWebGW }}"
-    dns: "{{Common.DNS}}"
+    gateway: "{{ Target.VMs.SEG_Web_GW }}"
+    dns: "{{ Common.DNS }}"
     guest_username: "root"
-    guest_password: "VMware1!VMware1!"
-    segment: "SEG-Web"  
+    guest_password: "{{ Common.Password.VMs }}"
+    segment: "{{ Target.vCenter.PortGroup.Web }}"
   #- name: web-02a
   #  ip: 10.225.0.102
   #  subnet_mask_bits: 24
@@ -24,19 +24,19 @@ ova_config:
   #  guest_username: "root"
   #  guest_password: "VMware1!VMware1!"
   #  segment: "SEG-Web"
-  - name: app-01a
-    ip: 10.225.0.104
-    subnet_mask_bits: 24
-    gateway: "{{ Common.Network.SEGAppGW }}"
-    dns: 10.225.0.5
-    guest_username: "root"
-    guest_password: "VMware1!VMware1!"
-    segment: "SEG-App"
-  - name: db-01a
-    ip: 10.225.0.105
-    subnet_mask_bits: 24
-    gateway: "{{ Common.Network.SEGDBGW }}"
-    dns: 10.225.0.5
-    guest_username: "root"
-    guest_password: "VMware1!VMware1!"
-    segment: "SEG-DB"
+  #- name: app-01a
+  # ip: 10.225.0.104
+  # subnet_mask_bits: 24
+  # gateway: "{{ Target.VMs.SEG-App-GW }}"
+  #  dns: "{{ Common.DNS }}"
+  #  guest_username: "root"
+  #  guest_password: "{{ Common.Password.VMs }}"
+  #  segment: "SEG-App"
+  #- name: db-01a
+  #  ip: 10.225.0.105
+  #  subnet_mask_bits: 24
+  #  gateway: "{{ Target.VMs.SEG-DB-GW }}"
+  #  dns: "{{ Common.DNS }}"
+  #  guest_username: "root"
+  #  guest_password: "{{ Common.Password.VMs }}"
+  #  segment: "SEG-DB"

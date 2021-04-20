@@ -1,42 +1,3 @@
-- name: Walk through the setup - Creating static IP - Step 1
-  community.vmware.vmware_guest_sendkey:
-    hostname: "{{ Target.vCenter.FQDN }}"
-    username: "{{ Target.vCenter.User }}"
-    password: "{{ Common.Password.Physical }}"
-    validate_certs: no
-    name: "{{ item.name }}"
-    string_send: "mv /etc/systemd/network/99-dhcp-en.network /etc/systemd/network/10-static-eth0.network"
-
-    #- name: Run command inside a virtual machine
-    #    community.vmware.vmware_vm_shell:
-    #      hostname: "{{ Target.vCenter.FQDN }}"
-    #      username: "{{ Target.vCenter.User }}"
-    #      password: "{{ Common.Password.Physical }}"
-    #      datacenter: "{{ datacenter }}"
-    #      folder: "/{{datacenter}}/vm"
-    #      vm_id: "{{ vm_name }}"
-    #      vm_username: root
-    #      vm_password: superSecret
-    #      vm_shell: /bin/mv
-    #      vm_shell_args: " /etc/systemd/network/99-dhcp-en.network /etc/systemd/network/10-static-eth0.network"
-    #      # vm_shell_env:
-    #      #   - "PATH=/bin"
-    #      #   - "VAR=test"
-    #      # vm_shell_cwd: "/tmp"
-    #    delegate_to: localhost
-    #    register: shell_command_output
-      
-
-- name: Walk through the setup dialog 2 (Press 'ENTER' after command)
-  community.vmware.vmware_guest_sendkey:
-    hostname: "{{ Target.vCenter.FQDN }}"
-    username: "{{ Target.vCenter.User }}"
-    password: "{{ Common.Password.Physical }}"
-    validate_certs: no
-    name: "{{ item.name }}"
-    keys_send:
-      - ENTER 
-
 - name: Render templated network config file
   template:
     src: templates/10-static-eth0.network.j2
@@ -50,11 +11,30 @@
     password: "{{ Common.Password.Physical }}"
     datacenter: "{{ Target.vCenter.DataCenter }}"
     vm_id: "{{ item.name }}"
-    vm_username: "{{ item.guest_username }}"
-    vm_password: "{{ item.guest_password }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
     copy:
       src: templates/{{item.name}}-10-static-eth0.network
       dest: /etc/systemd/network/10-static-eth0.network
       overwrite: true
     validate_certs: false
   delegate_to: localhost
+
+- name: Walk through the setup - Restart Systemd-networkd
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "reboot"
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 

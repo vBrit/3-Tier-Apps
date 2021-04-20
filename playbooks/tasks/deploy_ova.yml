@@ -113,7 +113,7 @@
     password: "{{ Common.Password.Physical }}" 
     validate_certs: no
     name: "{{ item.name }}"
-    string_send: "{{Common.Password.Guest}}"
+    string_send: "{{Common.Password.VMs}}"
 
 - name: Wait 1 seconds
   ansible.builtin.pause:
@@ -140,7 +140,7 @@
     password: "{{ Common.Password.Physical }}"
     validate_certs: no
     name: "{{ item.name }}"
-    string_send: "{{Common.Password.Guest}}"
+    string_send: "{{Common.Password.VMs}}"
 
 - name: Wait 1 seconds
   ansible.builtin.pause:
@@ -229,8 +229,8 @@
     password: "{{ Common.Password.Physical }}"
     datacenter: "{{ Target.vCenter.DataCenter }}"
     vm_id: "{{ item.name }}"
-    vm_username: "{{ item.guest_username }}"
-    vm_password: "{{ item.guest_password }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
     copy:
       src: templates/{{item.name}}-10-static-eth0.network
       dest: /etc/systemd/network/10-static-eth0.network
@@ -255,4 +255,4 @@
     validate_certs: no
     name: "{{ item.name }}"
     keys_send:
-      - ENTER 
+      - ENTER
