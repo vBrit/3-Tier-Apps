@@ -1,40 +1,40 @@
 ---
 ova_config:
   - name: web-01a
-    ip: "192.168.{{Common.SiteCode + 1}}.11"
-    subnet_mask_bits: 24
+    ip: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.11"
+    #subnet_mask_bits: 24
     gateway: "{{ Target.VMs.SEG_Web_GW }}"
     dns: "{{ Common.DNS }}"
     guest_username: "root"
     guest_password: "{{ Common.Password.VMs }}"
     segment: "{{ Target.vCenter.PortGroup.Web }}"
   - name: web-02a
-    ip: "192.168.{{Common.SiteCode + 1}}.12"
-    subnet_mask_bits: 24
+    ip: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.12"
+    #subnet_mask_bits: 24
     gateway: "{{ Target.VMs.SEG_Web_GW }}"
     dns: "{{ Common.DNS }}"
     guest_username: "root"
     guest_password: "{{ Common.Password.VMs }}"
     segment: "{{ Target.vCenter.PortGroup.Web }}"
   - name: web-03a
-    ip: "192.168.{{Common.SiteCode + 1}}.13"
-    subnet_mask_bits: 24
+    ip: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.13"
+    #subnet_mask_bits: 24
     gateway: "{{ Target.VMs.SEG_Web_GW }}"
     dns: "{{ Common.DNS }}"
     guest_username: "root"
     guest_password: "{{ Common.Password.VMs }}"
     segment: "{{ Target.vCenter.PortGroup.Web }}"
   - name: app-01a
-    ip: "192.168.{{Common.SiteCode + 2}}.10"
-    subnet_mask_bits: 24
+    ip: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10"
+    #subnet_mask_bits: 24
     gateway: "{{ Target.VMs.SEG_App_GW }}"
     dns: "{{ Common.DNS }}"
     guest_username: "root"
     guest_password: "{{ Common.Password.VMs }}"
     segment: "{{ Target.vCenter.PortGroup.Web }}"
   - name: db-01a
-    ip: "192.168.{{Common.SiteCode + 3}}.10"
-    subnet_mask_bits: 24
+    ip: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.10"
+    #subnet_mask_bits: 24
     gateway: "{{ Target.VMs.SEG_DB_GW }}"
     dns: "{{ Common.DNS }}"
     guest_username: "root"

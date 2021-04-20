@@ -5,3 +5,6 @@ Common:
     Physical: "VMware1!"
     VMs: "VMware1!VMware1!"
   DNS: "10.225.0.5"
+  BaseNetwork:
+    IPv4: '172.18'
+    SubnetMask: 24

@@ -238,6 +238,28 @@
     validate_certs: false
   delegate_to: localhost
 
+- name: Render templated Hosts config file
+  template:
+    src: templates/hosts.j2
+    dest: templates/{{item.name}}-hosts
+  delegate_to: localhost
+
+- name: Copy rendered template into guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ item.name }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: templates/{{item.name}}-hosts
+      dest: /etc/hosts
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
+
 - name: Walk through the setup - Restart Systemd-networkd
   community.vmware.vmware_guest_sendkey:
     hostname: "{{ Target.vCenter.FQDN }}"
@@ -256,3 +278,4 @@
     name: "{{ item.name }}"
     keys_send:
       - ENTER
+

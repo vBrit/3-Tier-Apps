@@ -6,10 +6,10 @@ Begin /etc/hosts (network card version)
 
 # End /etc/hosts (network card version)  
 
-192.168.120.11 web-01a.corp.local web-01a
-192.168.120.12 web-02a.corp.local web-02a
-192.168.120.13 web-03a.corp.local web-03a
+{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.11 web-01a.corp.local web-01a
+{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.12 web-02a.corp.local web-02a
+{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.13 web-03a.corp.local web-03a
 
-192.168.120.10 app-01a.corp.local app-01a  
+{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10 app-01a.corp.local app-01a  
 
-192.168.120.10 db-01a.corp.local  db-01a
+{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.10 db-01a.corp.local  db-01a

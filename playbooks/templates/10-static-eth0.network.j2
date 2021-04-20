@@ -2,7 +2,7 @@
 Name=eth0    
 
 [Network]  
-Address={{item.ip}}/{{item.subnet_mask_bits}} 
+Address={{item.ip}}/24
 Gateway={{item.gateway}}
 DNS={{Common.DNS}}
 Domains=corp.local
