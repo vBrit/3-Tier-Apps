@@ -1,40 +1,37 @@
-- name: Render templated network config file
-  template:
-    src: templates/10-static-eth0.network.j2
-    dest: templates/{{item.name}}-10-static-eth0.network
-  delegate_to: localhost
-
-- name: Copy rendered template into guest
-  community.vmware.vmware_guest_file_operation:
-    hostname: "{{ Target.vCenter.FQDN }}"
-    username: "{{ Target.vCenter.User }}"
-    password: "{{ Common.Password.Physical }}"
-    datacenter: "{{ Target.vCenter.DataCenter }}"
-    vm_id: "{{ item.name }}"
-    vm_username: "root"
-    vm_password: "{{ Common.Password.VMs }}"
-    copy:
-      src: templates/{{item.name}}-10-static-eth0.network
-      dest: /etc/systemd/network/10-static-eth0.network
-      overwrite: true
-    validate_certs: false
-  delegate_to: localhost
-
-- name: Walk through the setup - Restart Systemd-networkd
+- name: Walk through the setup dialog 1 (Enter 'root' username)
   community.vmware.vmware_guest_sendkey:
     hostname: "{{ Target.vCenter.FQDN }}"
     username: "{{ Target.vCenter.User }}"
-    password: "{{ Common.Password.Physical }}"
+    password: "{{ Common.Password.Physical }}" 
     validate_certs: no
     name: "{{ item.name }}"
-    string_send: "reboot"
+    string_send: "root"
+  
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Walk through the setup dialog 1 (Enter 'current' password)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "VMware1!VMware1!"
 
 - name: Walk through the setup dialog 2 (Press 'ENTER')
   community.vmware.vmware_guest_sendkey:
     hostname: "{{ Target.vCenter.FQDN }}"
     username: "{{ Target.vCenter.User }}"
-    password: "{{ Common.Password.Physical }}"
+    password: "{{ Common.Password.Physical }}" 
     validate_certs: no
     name: "{{ item.name }}"
     keys_send:
-      - ENTER 
+      - ENTER
