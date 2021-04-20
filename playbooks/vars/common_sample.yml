@@ -6,7 +6,7 @@ Common:
     VMs: "VMware1!VMware1!"
   DNS: "10.225.0.5"
   BaseNetwork:
-    IPv4: '172.18'
+    IPv4: '192.168'
     SubnetMask: 24
 
 Target:

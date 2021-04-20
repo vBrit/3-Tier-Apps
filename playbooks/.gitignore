@@ -5,3 +5,9 @@ db-01a-10-static-eth0.network
 web-01a-10-static-eth0.network
 web-02a-10-static-eth0.network
 web-03a-10-static-eth0.network
+web-01a-hosts
+web-02a-hosts
+web-03a-hosts
+app-01a-hosts
+db-01a-hosts
+common.yml
