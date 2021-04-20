@@ -1,0 +1,14 @@
+Common:
+  SiteCode: 190
+  Password:
+    Nested:   "VMware1!"
+    Physical: "VMware1!"
+    Guest: "VMware1!VMware1!"
+  DNS: "10.225.0.5"
+  Network:
+    #SEGApp: 192.168.{{ Common.SiteCode }}.10
+    SEGAppGW: "192.168.191.1"
+    #SEGWeb: 192.168.{{ Common.SiteCode }}.10
+    SEGWebGW: "192.168.192.1"
+    #SEGDB: 192.168.{{ Common.SiteCode }}.10
+    SEGDBGW: "192.168.193.1"

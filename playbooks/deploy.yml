@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  become: no
+  gather_facts: False
+  vars_files:
+    - vars/common.yml
+    - vars/target-vcenter.yml
+    #- vars/servers.yml
+    - vars/ova_config.yml
+
+  tasks:
+    - name: Deploy OVA for each host
+      include_tasks: tasks/deploy_ova.yml
+      #include_tasks: tasks/test.yml
+      loop: "{{ ova_config }}"

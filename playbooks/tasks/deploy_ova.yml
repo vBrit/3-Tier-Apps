@@ -1,0 +1,258 @@
+---
+- name: Deploy {{ item.name }} Using Photon OS
+  community.vmware.vmware_deploy_ovf:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}" 
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    folder: ""
+    cluster: "{{ Target.vCenter.Cluster }}"
+    datastore: "{{ Target.vCenter.Datastore }}"
+    disk_provisioning: thin
+    networks: 
+      "None": "{{ item.segment }}"
+    ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
+    allow_duplicates: no
+    power_on: yes
+    fail_on_spec_warnings: yes
+    wait: no
+  delegate_to: localhost
+
+- name: Wait 2 minute for Photon {{ item.name }} to boot
+  ansible.builtin.pause:
+    seconds: 140
+  
+- name: Walk through the setup dialog 1 (Enter 'root' username)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "root"
+          
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+  
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+
+- name: Walk through the setup dialog 1 (Enter 'changeme' password)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "changeme"
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 1 (Enter 'current' password)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "changeme"
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 1 (Enter 'New' password)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "{{Common.Password.Guest}}"
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 1 (Enter 'New' password)
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "{{Common.Password.Guest}}"
+
+- name: Wait 1 seconds
+  ansible.builtin.pause:
+    seconds: 1
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Walk through the setup - Set root password not to expire
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "chage -M -1 root"
+      
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Walk through the setup - Set Hostname
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "hostnamectl set-hostname '{{ item.name }}'"
+      
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Walk through the setup - Rename DHCP to Static File
+  community.vmware.vmware_guest_sendkey:  
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "mv /etc/systemd/network/99-dhcp-en.network /etc/systemd/network/10-static-eth0.network"
+      
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
+- name: Render templated network config file
+  template:
+    src: templates/10-static-eth0.network.j2
+    dest: templates/{{item.name}}-10-static-eth0.network
+  delegate_to: localhost
+
+- name: Copy rendered template into guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ item.name }}"
+    vm_username: "{{ item.guest_username }}"
+    vm_password: "{{ item.guest_password }}"
+    copy:
+      src: templates/{{item.name}}-10-static-eth0.network
+      dest: /etc/systemd/network/10-static-eth0.network
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Walk through the setup - Restart Systemd-networkd
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "reboot"
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
