@@ -1,0 +1,6 @@
+#subnet_mask_bits: 24
+gateway: "{{ Target.VMs.SEG_Web_GW }}"
+dns: "{{ Common.DNS }}"
+guest_username: "root"
+guest_password: "{{ Common.Password.VMs }}"
+segment: "{{ Target.vCenter.PortGroup.Web }}"
