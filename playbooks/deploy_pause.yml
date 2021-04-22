@@ -1,13 +1,9 @@
 ---
-- hosts: localhost
+- hosts: all
   become: no
   gather_facts: False
-  vars_files:
-    - vars/common.yml
-    - vars/ova_config.yml
-
+  connection: local
   tasks:
-    - name: Deploy OVA
-      include_tasks: tasks/tasks_pause.yml
-      #include_tasks: tasks/test.yml
-      loop: "{{ ova_config }}"
+    - name: Wait 2 minute for Photon {{ inventory_hostname }} to boot
+      ansible.builtin.pause:
+        seconds: 10

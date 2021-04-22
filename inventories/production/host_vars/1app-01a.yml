@@ -1,0 +1,5 @@
+#subnet_mask_bits: 24
+dns: "{{ Common.DNS }}"
+guest_username: "root"
+guest_password: "{{ Common.Password.VMs }}"
+segment: "{{ Target.vCenter.PortGroup.App }}"

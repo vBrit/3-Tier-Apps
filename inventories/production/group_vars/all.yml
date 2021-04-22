@@ -23,7 +23,3 @@ Target:
       Web: "SEG-Web"                                                          # SEG-Web - PortGroup which the Web Servers will attach to
       App: "SEG-App"                                                          # SEG-App - PortGroup which the App Server will attach to
       DB: "SEG-DB"                                                            # SEG-DB - PortGroup which the DB Server will attach to
-  VMs:
-    SEG_Web_GW: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.1"
-    SEG_App_GW: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.1"
-    SEG_DB_GW: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.1"

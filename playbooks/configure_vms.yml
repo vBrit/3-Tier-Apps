@@ -1,13 +1,420 @@
 ---
-- hosts: localhost
+- hosts: all
+  connection: local
   become: no
   gather_facts: False
-  vars_files:
-    - vars/common.yml
-    - vars/ova_config.yml
-
   tasks:
-    - name: Configure VMs
-      #include_tasks: tasks/test.yml
-      include_tasks: tasks/tasks_configure_vms.yml
-      loop: "{{ ova_config }}"
+    - name: Walk through the setup dialog 1 (Enter 'root' username)
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "root"
+              
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+
+    - name: Walk through the setup dialog 1 (Enter 'changeme' password)
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "changeme"
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Walk through the setup dialog 1 (Enter 'current' password)
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "changeme"
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Walk through the setup dialog 1 (Enter 'New' password)
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "{{Common.Password.VMs}}"
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Walk through the setup dialog 1 (Enter 'New' password)
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "{{Common.Password.VMs}}"
+
+    #- name: Wait 1 seconds
+    #  ansible.builtin.pause:
+    #    seconds: 1
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Walk through the setup - Set root password not to expire
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "chage -M -1 root"
+          
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Walk through the setup - Set Hostname
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "hostnamectl set-hostname '{{ inventory_hostname }}'"
+          
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Walk through the setup - Rename DHCP to Static File
+      community.vmware.vmware_guest_sendkey:  
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "mv /etc/systemd/network/99-dhcp-en.network /etc/systemd/network/10-static-eth0.network"
+          
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Render templated network config file
+      template:
+        src: templates/10-static-eth0.network.j2
+        dest: templates/{{inventory_hostname}}-10-static-eth0.network
+      delegate_to: localhost
+
+    - name: Copy rendered template into guest
+      community.vmware.vmware_guest_file_operation:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        datacenter: "{{ Target.vCenter.DataCenter }}"
+        vm_id: "{{ inventory_hostname }}"
+        vm_username: "root"
+        vm_password: "{{ Common.Password.VMs }}"
+        copy:
+          src: templates/{{inventory_hostname}}-10-static-eth0.network
+          dest: /etc/systemd/network/10-static-eth0.network
+          overwrite: true
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Render templated Hosts config file
+      template:
+        src: templates/hosts.j2
+        dest: templates/{{inventory_hostname}}-hosts
+      delegate_to: localhost
+
+    - name: Copy rendered Hosts template into guest
+      community.vmware.vmware_guest_file_operation:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        datacenter: "{{ Target.vCenter.DataCenter }}"
+        vm_id: "{{ inventory_hostname }}"
+        vm_username: "root"
+        vm_password: "{{ Common.Password.VMs }}"
+        copy:
+          src: templates/{{inventory_hostname}}-hosts
+          dest: /etc/hosts
+          overwrite: true
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Restart Network
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "systemctl restart systemd-networkd"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Allow ICMP in IpTables
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "iptables -A INPUT -p icmp -j ACCEPT"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Allow SSH in IpTables
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT "
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Allow Port 80
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Allow 8443
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "iptables -A INPUT -p tcp -m tcp --dport 8443 -j ACCEPT"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Save IPTables to make persistent
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "iptables-save > /etc/systemd/scripts/ip4save"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Install LSOF
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "tdnf install lsof "
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER
+
+    - name: Walk through the setup - Install LSOF
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "Y"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Walk through the setup - Reboot
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "reboot"
+
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}" 
+        keys_send:
+          - ENTER
+
+
