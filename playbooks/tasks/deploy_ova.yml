@@ -298,6 +298,48 @@
     keys_send:
       - ENTER
 
+- name: Walk through the setup - Install LSOF
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "tdnf install lsof "
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER
+
+- name: Wait 30 seconds
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: Walk through the setup - Install LSOF
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    string_send: "Y"
+
+- name: Walk through the setup dialog 2 (Press 'ENTER')
+  community.vmware.vmware_guest_sendkey:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}"
+    keys_send:
+      - ENTER 
+
 - name: Walk through the setup - Reboot
   community.vmware.vmware_guest_sendkey:
     hostname: "{{ Target.vCenter.FQDN }}"
