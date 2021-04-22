@@ -1,16 +1,5 @@
 ---
 all:
-  hosts:
-    1web-01a:
-      ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.11"
-    1web-02a:
-      ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.12"
-    1web-03a:
-      ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.13"
-    1app-01a:
-      ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10"
-    1db-01a:
-      ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.10"
   children:
     web:
       hosts:

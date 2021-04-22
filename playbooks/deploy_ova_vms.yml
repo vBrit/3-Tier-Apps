@@ -17,7 +17,7 @@
         datastore: "{{ Target.vCenter.Datastore }}"
         disk_provisioning: thin
         networks: 
-          "None": "{{ segment }}"
+          "None": "{{ PortGroup }}"
         ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
         allow_duplicates: no
         power_on: yes

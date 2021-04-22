@@ -19,7 +19,3 @@ Target:
     DataCenter: Pod-240-DataCenter                                            # DataCenter - Defines under which DataCenter object the lab Pod's are deployed
     Cluster: Compute-A                                                        # Cluster - Defines which vSphere cluster within DataCenter the lab Pod's are deployed
     Datastore: Compute-A_vSAN                                                        # Datastore - Defines Which datastore should the nested lab Pod VMs be placed
-    PortGroup:                                                                # Various PortGroups used during deployment
-      Web: "SEG-Web"                                                          # SEG-Web - PortGroup which the Web Servers will attach to
-      App: "SEG-App"                                                          # SEG-App - PortGroup which the App Server will attach to
-      DB: "SEG-DB"                                                            # SEG-DB - PortGroup which the DB Server will attach to

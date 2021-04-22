@@ -2,8 +2,8 @@
 Name=eth0    
 
 [Network]  
-Address={{item.ip}}/24
-Gateway={{item.gateway}}
+Address={{ansible_host}}/24
+Gateway={{gateway}}
 DNS={{Common.DNS}}
 Domains=corp.local
 

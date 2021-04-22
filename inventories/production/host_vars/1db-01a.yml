@@ -1,5 +1,2 @@
 #subnet_mask_bits: 24
-dns: "{{ Common.DNS }}"
-guest_username: "root"
-guest_password: "{{ Common.Password.VMs }}"
-segment: "{{ Target.vCenter.PortGroup.DB }}"
+ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.10"
