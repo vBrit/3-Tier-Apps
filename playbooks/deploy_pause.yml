@@ -6,4 +6,5 @@
   tasks:
     - name: Wait 2 minute for Photon {{ inventory_hostname }} to boot
       ansible.builtin.pause:
-        seconds: 10
+        seconds: 140
+      run_once: true

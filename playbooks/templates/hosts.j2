@@ -7,5 +7,5 @@ Begin /etc/hosts (network card version)
 # End /etc/hosts (network card version)  
 
 {% for hostname, vars in hostvars.items() %}
-{{ ansible_host }}  {{ inventory_hostname}}.corp.local {{ inventory_hostname}}
+{{ ansible_host }}  {{ hostname}}.corp.local {{ hostname}}
 {% endfor %}
