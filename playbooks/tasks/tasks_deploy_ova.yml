@@ -1,0 +1,25 @@
+---
+- name: Deploy {{ item.name }} Using Photon OS
+  community.vmware.vmware_deploy_ovf:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}" 
+    validate_certs: no
+    name: "{{ item.name }}" 
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    folder: ""
+    cluster: "{{ Target.vCenter.Cluster }}"
+    datastore: "{{ Target.vCenter.Datastore }}"
+    disk_provisioning: thin
+    networks: 
+      "None": "{{ item.segment }}"
+    ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
+    allow_duplicates: no
+    power_on: yes
+    fail_on_spec_warnings: yes
+    wait: no
+  delegate_to: localhost
+
+#- name: Wait 2 minute for Photon {{ item.name }} to boot
+#  ansible.builtin.pause:
+#    seconds: 140

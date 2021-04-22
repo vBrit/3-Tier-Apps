@@ -1,0 +1,12 @@
+##
+##
+---
+# Create Web,App and DB Servers.
+- import_playbook: playbooks/deploy_ova_vms.yml
+
+- import_playbook: playbooks/deploy_pause.yml
+# Configure Web,App and DB Servers.
+- import_playbook: playbooks/configure_vms.yml
+
+# Configure Web,App and DB Servers.
+#- import_playbook: playbooks/config_iptables.yml

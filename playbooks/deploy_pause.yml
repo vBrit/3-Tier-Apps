@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  become: no
+  gather_facts: False
+  vars_files:
+    - vars/common.yml
+    - vars/ova_config.yml
+
+  tasks:
+    - name: Deploy OVA
+      include_tasks: tasks/tasks_pause.yml
+      #include_tasks: tasks/test.yml
+      loop: "{{ ova_config }}"

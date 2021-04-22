@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  become: no
+  gather_facts: False
+  vars_files:
+    - vars/common.yml
+    - vars/ova_config.yml
+
+  tasks:
+    - name: Configure VMs
+      #include_tasks: tasks/test.yml
+      include_tasks: tasks/tasks_configure_vms.yml
+      loop: "{{ ova_config }}"
