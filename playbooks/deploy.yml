@@ -11,4 +11,5 @@
     - name: Deploy OVA for each host
       include_tasks: tasks/deploy_ova.yml
       #include_tasks: tasks/test.yml
+      #include_tasks: tasks/configure_vm.yml
       loop: "{{ ova_config }}"
