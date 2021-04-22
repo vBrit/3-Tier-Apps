@@ -6,10 +6,6 @@ Begin /etc/hosts (network card version)
 
 # End /etc/hosts (network card version)  
 
-{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.11 web-01a.corp.local web-01a
-{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.12 web-02a.corp.local web-02a
-{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.13 web-03a.corp.local web-03a
-
-{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10 app-01a.corp.local app-01a  
-
-{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.10 db-01a.corp.local  db-01a
+{% for hostname, vars in hostvars.items() %}
+{{ ansible_host }}  {{ inventory_hostname}}.corp.local {{ inventory_hostname}}
+{% endfor %}
