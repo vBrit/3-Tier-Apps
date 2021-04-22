@@ -1,3 +1,0 @@
-- name: Wait 2 minute for Photon {{ item.name }} to boot
-  ansible.builtin.pause:
-    seconds: 10
