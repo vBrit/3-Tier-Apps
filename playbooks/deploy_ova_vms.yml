@@ -4,7 +4,7 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Deploy {{ inventory_hostname }} Using Photon OS
+    - name: Deploy OVAs for Inventory Using Photon OS
       community.vmware.vmware_deploy_ovf:
         hostname: "{{ Target.vCenter.FQDN }}"
         username: "{{ Target.vCenter.User }}"
