@@ -3,15 +3,15 @@ all:
   children:
     web:
       hosts:
-        1web-01a:
-        #1web-02a:
-        #1web-03a:
+        web-01a:
+        web-02a:
+        web-03a:
     db:
       hosts:
-        1db-01a:
+        db-01a:
       vars:
         ansible_user: "root"
         ansible_pass: VMware1!VMWare!
     app:
       hosts:
-        1app-01a:
+        app-01a:

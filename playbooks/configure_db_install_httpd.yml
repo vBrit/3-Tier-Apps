@@ -45,7 +45,6 @@
     #  ansible.builtin.pause:
     #    seconds: 1
 
-
     - name: Install httpd
       community.vmware.vmware_guest_sendkey:
         hostname: "{{ Target.vCenter.FQDN }}"
@@ -54,10 +53,6 @@
         validate_certs: no
         name: "{{ inventory_hostname }}"
         string_send: "tdnf install httpd"
-
-    #- name: Wait 1 seconds
-    #  ansible.builtin.pause:
-    #    seconds: 1
 
     - name: Press 'ENTER'
       community.vmware.vmware_guest_sendkey:
@@ -68,6 +63,10 @@
         name: "{{ inventory_hostname }}"
         keys_send:
           - ENTER 
+
+    - name: Wait 30 seconds
+      ansible.builtin.pause:
+        seconds: 30
 
     - name: Enter Y to Question
       community.vmware.vmware_guest_sendkey:
@@ -88,7 +87,49 @@
         keys_send:
           - ENTER 
 
-    - name: Copy data.py into guest
+    - name: Install sqlite
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "tdnf install sqlite"
+
+    
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Wait 30 seconds
+      ansible.builtin.pause:
+        seconds: 30
+    - name: Enter Y to Question
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        string_send: "Y"
+              
+    - name: Press 'ENTER'
+      community.vmware.vmware_guest_sendkey:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}" 
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        keys_send:
+          - ENTER 
+
+    - name: Copy data.py into db server
       community.vmware.vmware_guest_file_operation:
         hostname: "{{ Target.vCenter.FQDN }}"
         username: "{{ Target.vCenter.User }}"
@@ -104,7 +145,7 @@
         validate_certs: false
       delegate_to: localhost
 
-    - name: Copy data.py into guest
+    - name: Copy clients.db into db server
       community.vmware.vmware_guest_file_operation:
         hostname: "{{ Target.vCenter.FQDN }}"
         username: "{{ Target.vCenter.User }}"
@@ -115,7 +156,7 @@
         vm_password: "{{ Common.Password.VMs }}"
         copy:
           src: templates/clients.db
-          dest: /etc/httpd/db/clients.db
+          dest: /etc/httpd/clients.db
           overwrite: true
         validate_certs: false
       delegate_to: localhost
