@@ -406,5 +406,10 @@
         name: "{{ inventory_hostname }}" 
         keys_send:
           - ENTER
+    - name: Wait for Install to finish and OS to reboot
+      ansible.builtin.pause:
+        seconds: 125
+      run_once: true
+
 
 
