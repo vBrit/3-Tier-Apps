@@ -18,6 +18,8 @@
         disk_provisioning: thin
         networks: 
           "None": "{{ PortGroup }}"
+        #ova: /Software/VMware/Photon/v1/photon-custom-hw11-1.0-62c543d.ova
+        #ova: /Software/VMware/Photon/v2/photon-custom-hw11-2.0-304b817.ova
         ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
         #ova: /Software/VMware/Photon/v4/photon-hw11-4.0-1526e30ba0.ova
         allow_duplicates: no

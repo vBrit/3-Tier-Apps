@@ -9,9 +9,9 @@ all:
     db:
       hosts:
         db-01a:
-      vars:
-        ansible_user: "root"
-        ansible_pass: VMware1!VMWare!
     app:
       hosts:
         app-01a:
+  vars:
+    ansible_user: "root"
+    ansible_password: VMware1!VMware1!
