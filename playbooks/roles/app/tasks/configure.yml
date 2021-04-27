@@ -4,3 +4,33 @@
     src: templates/csr.j2
     dest: templates/app-01a.conf
   delegate_to: localhost
+
+- name: Copy app-01a.conf to /tmp
+  copy:
+    src: templates/app-01a.conf
+    dest: /tmp/app-01a.conf
+
+- shell: 'openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /tmp/app.key -out /tmp/app.pem -config /tmp/app-01a.conf'
+- shell: 'mv /tmp/app.key /etc/httpd/conf/server.key'
+- shell: 'mv /tmp/app.pem /etc/httpd/conf/server.crt'
+
+- name: Copy httpd.conf to /etc/httpd
+  copy:
+    src: files/httpd.conf
+    dest: /etc/httpd/httpd.conf
+
+- name: Copy httpd-ssl.conf to /etc/httpd/conf/extra/httpd-ssl.conf
+  copy:
+    src: files/httpd-ssl.conf
+    dest: /etc/httpd/conf/extra/httpd-ssl.conf
+
+- shell: 'systemctl start httpd'
+- shell: 'systemctl enable httpd'
+
+- name: Copy httpd-ssl.conf to /etc/httpd/cgi-bin/app.py
+  copy:
+    src: files/app.py
+    dest: /etc/httpd/cgi-bin/app.py
+
+- shell: 'chmod 755 /etc/httpd/cgi-bin/app.py'
+
