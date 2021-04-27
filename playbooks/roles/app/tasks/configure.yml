@@ -1,0 +1,6 @@
+---
+- name: Render templated network config file
+  template:
+    src: templates/csr.j2
+    dest: templates/app-01a.conf
+  delegate_to: localhost

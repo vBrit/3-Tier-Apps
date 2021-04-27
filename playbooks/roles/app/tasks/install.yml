@@ -1,0 +1,7 @@
+---
+- shell: 'tdnf -y install httpd'
+#- shell: 'tdnf -y install sqlite'
+
+#- name: Wait 30 seconds
+#  ansible.builtin.pause:
+#    seconds: 30
