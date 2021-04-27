@@ -1,0 +1,20 @@
+---
+- name: Create /etc/httpd/db directory
+  ansible.builtin.file:
+    path: /etc/nginx/ssl
+    state: directory
+
+- name: Copy webapp.conf to /tmp
+  copy:
+    src: templates/webapp.conf
+    dest: /tmp/webapp.conf
+
+- shell: 'openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /etc/nginx/ssl/webapp.key -out /etc/nginx/ssl/webapp.pem -config /tmp/webapp.conf'
+
+- name: Copy nginx.conf to /etc/nginx/nginx.conf
+  copy:
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- shell: 'systemctl start nginx'
+- shell: 'systemctl enable nginx'
