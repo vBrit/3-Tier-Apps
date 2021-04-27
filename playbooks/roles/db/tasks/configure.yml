@@ -1,0 +1,36 @@
+---
+
+  - name: Create /etc/httpd/db directory
+    ansible.builtin.file:
+      path: /etc/httpd/db
+      state: directory
+
+  - name: Copy data.py into db server
+    ansible.builtin.copy:
+        src: files/data.py
+        dest: /etc/httpd/cgi-bin/data.py
+
+  - name: Copy clients.db /files/clients.db to /etc/httpd/
+    ansible.builtin.copy:
+      src: files/clients.db
+      dest: /etc/httpd/db/clients.db
+      
+  - name: Copy httpd.conf into /etc/httpd/
+    ansible.builtin.copy:
+      src: files/httpd.conf
+      dest: /etc/httpd/httpd.conf
+      backup: yes
+
+      
+
+  - name: "Run {{ item }}"
+    command: "{{ item }}"
+    loop:
+      - 'chown apache:apache /etc/httpd/db/'
+      - 'chown apache:apache /etc/httpd/db/clients.db'
+      - 'systemctl start httpd'
+      - 'systemctl enable httpd'
+      - 'chmod 755 /etc/httpd/cgi-bin/data.py'
+
+####--exit-- Create a handler-------######
+  - shell: 'systemctl restart httpd'
