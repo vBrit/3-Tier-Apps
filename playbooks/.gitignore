@@ -11,5 +11,6 @@ web-03a-hosts
 app-01a-hosts
 db-01a-hosts
 common.yml
+app-01a.conf
 1*
 
