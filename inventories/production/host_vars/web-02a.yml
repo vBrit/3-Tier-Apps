@@ -1,2 +1,2 @@
 #subnet_mask_bits: 24
-ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.12"
+ansible_host: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12"

@@ -1,2 +1,2 @@
-gateway: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 3}}.1"
+gateway: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.1"
 PortGroup: "SEG-DB"

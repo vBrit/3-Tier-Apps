@@ -1,28 +1,18 @@
-# This is the -u/--user flag on the CLI
-#ansible_user: "root"
-# This is the -k/--ask-pass flag
-#ansible_password: "VMWare1!VMware1!"
-# This is the -K/--ask-become-pass flag
-#ansible_become_password: mypasswordhere
-
 Common:
-  SiteCode: 20
+  SiteCode: 21                                          # This is the 3rd octec in the IP Address i.e 10.225."21".X based on IPv4 below
   Password:
-    Nested:   "VMware1!"
-    Physical: "VMware1!"
-    VMs: "VMware1!VMware1!"
-  DNS: "10.225.0.5"
+    Physical: "VMware1!"                                # Password used for the account on line 20
+    VMs: "VMware1!VMware1!"                             # Password that will be applied to the root account in each VM
+  DNS: "10.225.0.5"                                     # DNS
   BaseNetwork:
-    IPv4: '10.225'
-    SubnetMask: 24
+    IPv4: '192.168.'                                      # IP's used for Apps
+    SubnetMask: 24                                      #
 
 Target:
-  vCenter:                                                                    # Settings used when "vCenter" deployment is chosen (TargetConfig.Deployment == "vCenter")
-    FQDN: pod-240-vcenter.sddc.lab                                            # FQDN - The FQDN to your physical vCenter Server
-    User: administrator@vsphere.local                                               # User - vCenter Server user account.  We suggest you create a dedicate account for deployments, such as SDDCLab@vsphere.local
-    Password: "{{ Common.Password.Physical }}"                                # Password - Password used by User to authenticate to the physical vCenter Server
-    vSwitch: SDDCLab_vDS                                                      # vSwitch - Name of the vDS which is automatically provisioned by the playbooks, and where all the Pod Port-Groups are crated
-    vSwitchVersion: 6.6.0                                                     # vSwitchVersion - vDS version used for the given vSwitch
-    DataCenter: Pod-240-DataCenter                                            # DataCenter - Defines under which DataCenter object the lab Pod's are deployed
-    Cluster: Compute-A                                                        # Cluster - Defines which vSphere cluster within DataCenter the lab Pod's are deployed
-    Datastore: Compute-A_vSAN                                                        # Datastore - Defines Which datastore should the nested lab Pod VMs be placed
+  vCenter:                                              # Settings used when "vCenter" deployment is chosen (TargetConfig.Deployment == "vCenter")
+    FQDN: pod-240-vcenter.sddc.lab                      # FQDN - The FQDN to your physical vCenter Server
+    User: administrator@vsphere.local                   # User - vCenter Server user account.  We suggest you create a dedicate account for deployments, such as SDDCLab@vsphere.local
+    Password: "{{ Common.Password.Physical }}"          # Password - Password used by User to authenticate to the physical vCenter Server
+    DataCenter: Pod-240-DataCenter                      # DataCenter - Defines under which DataCenter object the lab Pod's are deployed
+    Cluster: Compute-A                                  # Cluster - Defines which vSphere cluster within DataCenter the lab Pod's are deployed
+    Datastore: Compute-A_vSAN                           # Datastore - Defines Which datastore should the nested lab Pod VMs be placed
