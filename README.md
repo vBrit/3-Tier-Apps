@@ -1,5 +1,5 @@
 # 3-Tier-Apps
-![Overview Image] (https://github.com/vBrit/3-Tier-Apps/blob/main/images/3-Tier.png)
+![Overview Image](https://github.com/vBrit/3-Tier-Apps/blob/main/images/3-Tier.png)
 ## Overview
 
 This playbook will create a new 3 Tier Apps based on the 3-Tier Apps used in the HOL from VMWare. I created this to spin up quick 3-Tier apps to run 
