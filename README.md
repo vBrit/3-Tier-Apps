@@ -5,17 +5,34 @@
 
 ansible-playbook -i inventories/production/inventory.yml deploy.yml
 
-# Lab AutoDeployment Collection !!!!NEEDTOFINISH!!!!
-
 ## Overview
 
-This playbook will create a new 3 Tier Apps based on the 3-Tier Apps used in the HOL from VMWare
+This playbook will create a new 3 Tier Apps based on the 3-Tier Apps used in the HOL from VMWare. I created this to spin up quick 3-Tier apps to run 
+inside SDDC created using https://github.com/rutgerblom/SDDC.Lab/tree/dev-v3
 
 ## Requirements
 
+Ansible Controller - I used ubuntu 18
 
+Update deploy_ova_vms.yml to point to the location of the Photon OS on your Ansilble Controller. (Tried and tested with Photon 3, Photon 4 not working atm) 
+
+NSX Segments named SEG-App, SEG-Web, SEG-DB.
+
+Edit the inventory/production/group_vars/all.yml and update 
+
+SiteCode - I used 21 and with my IPv4 the IP's used will be 10.225.21.11, 12, 13 for Web Servers, 10.225.22.10 App Server and 10.225.23.10 for DB Server.
+Passwords
+DNS - Not that its used but it may later
+IPv4 - 10.225.
+vCenter FQDN
+Username
+DataCenter
+Cluster
+DataStore
 
 ### Playbooks
+
+ansible-playbook -i inventories/production/inventory.yml deploy.yml
 
 #### Root Directory
 
