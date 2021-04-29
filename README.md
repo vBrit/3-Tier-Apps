@@ -80,7 +80,9 @@ sudo apt-get install sshpass
 
 ## Thanks to
 
-https://github.com/kwrobert
+https://github.com/kwrobert 
+
+& https://github.com/doug-baer/hol-3-tier-app as you fixed some of the issues.
 
 ## Author
-Karl Newick
+Karl Newick who has never used Ansible before :)
