@@ -78,6 +78,9 @@ sudo ansible-galaxy collection install community.vmware
 sudo apt-get install sshpass
 ```
 
+## Thanks to
+
+https://github.com/kwrobert
 
 ## Author
 Karl Newick
