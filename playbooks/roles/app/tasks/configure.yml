@@ -27,10 +27,15 @@
 - shell: 'systemctl start httpd'
 - shell: 'systemctl enable httpd'
 
-- name: Copy httpd-ssl.conf to /etc/httpd/cgi-bin/app.py
+- name: Render templated app.py file
+  template:
+    src: templates/app.j2
+    dest: /tmp/app.py
+  delegate_to: localhost
+
+- name: Copy app.py to /etc/httpd/cgi-bin/app.py
   copy:
-    src: files/app.py
+    src: /tmp/app.py
     dest: /etc/httpd/cgi-bin/app.py
-
+    
 - shell: 'chmod 755 /etc/httpd/cgi-bin/app.py'
-

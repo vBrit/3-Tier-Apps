@@ -15,15 +15,15 @@ NSX Segments named SEG-App, SEG-Web, SEG-DB.
 
 Edit the inventory/production/group_vars/all.yml and update 
 
-SiteCode - I used 21 and with my IPv4 the IP's used will be 10.225.21.11, 12, 13 for Web Servers, 10.225.22.10 App Server and 10.225.23.10 for DB Server.
-Passwords
-DNS - Not that its used but it may later
-IPv4 - 10.225.
-vCenter FQDN
-Username
-DataCenter
-Cluster
-DataStore
+* SiteCode - I used 21 and with my IPv4 the IP's used will be 10.225.21.11, 12, 13 for Web Servers, 10.225.22.10 App Server and 10.225.23.10 for DB Server.
+* Passwords
+* DNS - Not that its used but it may later
+* IPv4 - 10.225.
+* vCenter FQDN
+* Username
+* DataCenter
+* Cluster
+* DataStore
 
 ### Playbooks
 

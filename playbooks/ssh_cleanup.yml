@@ -1,0 +1,11 @@
+# I keep forgetting to remove the ssh keys from the know hosts so I just created this instead.
+---
+- hosts: 127.0.0.1
+  become: no
+  connection: local
+  tasks:
+    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10"
+    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.10"
+    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11"
+    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12"
+    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13"

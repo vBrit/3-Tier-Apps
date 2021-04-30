@@ -14,4 +14,4 @@ all:
         app-01a:
   vars:
     ansible_user: "root"
-    ansible_password: VMware1!VMware1!
+    ansible_password: "{{ Common.Password.VMs }}"

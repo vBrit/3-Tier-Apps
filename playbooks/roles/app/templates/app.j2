@@ -7,9 +7,9 @@ import cgi
 import requests
 
 webservers = {
-  '192.168.120.30': 'web-01a',
-  '192.168.120.31': 'web-02a',
-  '192.168.120.32': 'web-03a'
+  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11': 'web-01a',
+  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12': 'web-02a',
+  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13': 'web-03a'
  }
 
 print("Content-type:text/html\n\n")

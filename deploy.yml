@@ -1,6 +1,9 @@
 ##
 ##
 ---
+#Clean up ssh keys to prevent issues.
+- import_playbook: playbooks/ssh_cleanup.yml
+
 # Create Web,App and DB Servers.
 - import_playbook: playbooks/deploy_ova_vms.yml
 
