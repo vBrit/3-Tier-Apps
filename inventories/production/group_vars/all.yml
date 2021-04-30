@@ -5,7 +5,7 @@ Common:
     VMs: "VMware1!VMware1!"                             # Password that will be applied to the root account in each VM
   DNS: "10.225.0.5"                                     # DNS
   BaseNetwork:
-    IPv4: '192.168.'                                      # IP's used for Apps
+    IPv4: '10.225'                                      # IP's used for Apps i.e ."10.225"
     SubnetMask: 24                                      #
 
 Target:
