@@ -7,5 +7,7 @@ Begin /etc/hosts (network card version)
 # End /etc/hosts (network card version)  
 
 {% for hostname, vars in hostvars.items() %}
+{% if vars.get("ansible_host") is not none %}
 {{ vars["ansible_host"] }}  {{ hostname }}.corp.local {{ hostname }}
+{% endif %}
 {% endfor %}

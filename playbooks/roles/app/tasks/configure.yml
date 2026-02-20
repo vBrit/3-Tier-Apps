@@ -14,10 +14,15 @@
 - shell: 'mv /tmp/app.key /etc/httpd/conf/server.key'
 - shell: 'mv /tmp/app.pem /etc/httpd/conf/server.crt'
 
-- name: Copy httpd.conf to /etc/httpd
+- name: Remove Old httpd.conf in /etc/httpd/
+  ansible.builtin.file:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+
+- name: Copy httpd.conf to /etc/httpd/conf/
   copy:
     src: files/httpd.conf
-    dest: /etc/httpd/httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
 
 - name: Copy httpd-ssl.conf to /etc/httpd/conf/extra/httpd-ssl.conf
   copy:

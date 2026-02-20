@@ -1,6 +1,17 @@
 ##
 ##
 ---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Preflight - ensure host key checking is disabled
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.config', 'HOST_KEY_CHECKING') in [False, 'False', 'false', 0, '0']
+        fail_msg: "HOST_KEY_CHECKING is enabled. Set host_key_checking = False in ansible.cfg or run with ANSIBLE_HOST_KEY_CHECKING=False."
+        success_msg: "HOST_KEY_CHECKING is disabled. Continuing deployment."
+
 #Clean up ssh keys to prevent issues.
 - import_playbook: playbooks/ssh_cleanup.yml
 

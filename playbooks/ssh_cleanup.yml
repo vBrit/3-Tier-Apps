@@ -4,8 +4,30 @@
   become: no
   connection: local
   tasks:
-    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10"
-    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.10"
-    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11"
-    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12"
-    - shell: ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13"
+    - name: Get current user
+      shell: whoami
+      register: current_user
+      changed_when: false
+    
+    - name: Ensure .ssh directory exists
+      file:
+        path: /home/{{ current_user.stdout }}/.ssh
+        state: directory
+        mode: '0700'
+    
+    - name: Ensure known_hosts file exists
+      file:
+        path: /home/{{ current_user.stdout }}/.ssh/known_hosts
+        state: touch
+        mode: '0600'
+    
+    - shell: ssh-keygen -f "/home/{{ current_user.stdout }}/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 2}}.10"
+      ignore_errors: yes
+    - shell: ssh-keygen -f "/home/{{ current_user.stdout }}/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.10"
+      ignore_errors: yes
+    - shell: ssh-keygen -f "/home/{{ current_user.stdout }}/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11"
+      ignore_errors: yes
+    - shell: ssh-keygen -f "/home/{{ current_user.stdout }}/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12"
+      ignore_errors: yes
+    - shell: ssh-keygen -f "/home/{{ current_user.stdout }}/.ssh/known_hosts" -R "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13"
+      ignore_errors: yes

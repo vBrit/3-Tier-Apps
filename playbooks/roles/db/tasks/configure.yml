@@ -15,10 +15,15 @@
       src: files/clients.db
       dest: /etc/httpd/db/clients.db
       
+  - name: Remove Old httpd.conf in /etc/httpd/
+    ansible.builtin.file:
+      path: /etc/httpd/conf/httpd.conf
+      state: absent
+
   - name: Copy httpd.conf into /etc/httpd/
     ansible.builtin.copy:
       src: files/httpd.conf
-      dest: /etc/httpd/httpd.conf
+      dest: /etc/httpd/conf/httpd.conf
       backup: yes
 
       

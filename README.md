@@ -15,6 +15,14 @@ NSX Segments named SEG-App, SEG-Web, SEG-DB.
 
 Edit the inventory/production/group_vars/all.yml and update 
 
+Copy the template first:
+
+```
+cp inventories/production/group_vars/all.yml.template inventories/production/group_vars/all.yml
+```
+
+Do not commit `inventories/production/group_vars/all.yml` (local secrets/config only).
+
 * SiteCode - I used 21 and with my IPv4 the IP's used will be 10.225.21.11, 12, 13 for Web Servers, 10.225.22.10 App Server and 10.225.23.10 for DB Server.
 * Passwords
 * DNS - Not that its used but it may later

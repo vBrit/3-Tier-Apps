@@ -4,9 +4,9 @@
     path: /etc/nginx/ssl
     state: directory
 
-- name: Copy webapp.conf to /tmp
-  copy:
-    src: templates/webapp.conf
+- name: Render webapp.conf to /tmp
+  template:
+    src: webapp.conf
     dest: /tmp/webapp.conf
 
 - shell: 'openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /etc/nginx/ssl/webapp.key -out /etc/nginx/ssl/webapp.pem -config /tmp/webapp.conf'
@@ -16,5 +16,5 @@
     src: files/nginx.conf
     dest: /etc/nginx/nginx.conf
 
-- shell: 'systemctl start nginx'
+- shell: 'systemctl restart nginx'
 - shell: 'systemctl enable nginx'

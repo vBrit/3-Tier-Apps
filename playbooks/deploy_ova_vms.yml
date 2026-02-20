@@ -4,6 +4,17 @@
   connection: local
   gather_facts: False
   tasks:
+    - name: Ensure VM folder exists in vCenter
+      community.vmware.vcenter_folder:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        datacenter_name: "{{ Target.vCenter.DataCenter }}"
+        folder_name: "{{ Target.vCenter.Folder | default('3-Tier') }}"
+        folder_type: vm
+        state: present
+
     - name: Deploy OVAs for Inventory Using Photon OS
       community.vmware.vmware_deploy_ovf:
         hostname: "{{ Target.vCenter.FQDN }}"
@@ -12,7 +23,7 @@
         validate_certs: no
         name: "{{ inventory_hostname }}" 
         datacenter: "{{ Target.vCenter.DataCenter }}"
-        folder: ""
+        folder: "/{{ Target.vCenter.DataCenter }}/vm/{{ Target.vCenter.Folder | default('3-Tier') }}"
         cluster: "{{ Target.vCenter.Cluster }}"
         datastore: "{{ Target.vCenter.Datastore }}"
         disk_provisioning: thin
@@ -20,14 +31,15 @@
           "None": "{{ PortGroup }}"
         #ova: /Software/VMware/Photon/v1/photon-custom-hw11-1.0-62c543d.ova
         #ova: /Software/VMware/Photon/v2/photon-custom-hw11-2.0-304b817.ova
-        ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
+        #ova: /Software/VMware/Photon/v3/photon-hw11-3.0-a383732.ova
         #ova: /Software/VMware/Photon/v4/photon-hw11-4.0-1526e30ba0.ova
+        ova: /Software/VMware/Photon/v5/photon-hw15-5.0-dde71ec57.x86_64.ova
         allow_duplicates: no
         power_on: yes
         fail_on_spec_warnings: yes
         wait: no
     - name: Wait for Photon to boot
       ansible.builtin.pause:
-        seconds: 140
+        seconds: 40
       run_once: true
 
