@@ -9,7 +9,7 @@ inside SDDC created using https://github.com/rutgerblom/SDDC.Lab/tree/dev-v3
 
 Ansible Controller - I used ubuntu 18
 
-Update deploy_ova_vms.yml to point to the location of the Photon OS on your Ansilble Controller. (Tried and tested with Photon 3, Photon 4 not working atm) 
+Update `playbooks/deploy_ova_vms.yml` to point to the location of the Photon OS OVA on your Ansible controller (current default is Photon v5).
 
 NSX Segments named SEG-App, SEG-Web, SEG-DB.
 
@@ -72,11 +72,21 @@ sudo apt-get install python3-pip
 sudo pip3 install ansible
 ```
 
+#### Python dependencies (recommended)
+```
+pip3 install -r requirements.txt
+```
+
 ### Install Ansible Collections
 
 #### vSphere
 ```
 sudo ansible-galaxy collection install community.vmware
+```
+
+Or install collections from file:
+```
+ansible-galaxy collection install -r collections/requirements.yml
 ```
 
 ### Install Additional Components

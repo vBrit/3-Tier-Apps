@@ -3,6 +3,7 @@
   ansible.builtin.file:
     path: /etc/nginx/ssl
     state: directory
+    mode: '0755'
 
 - name: Render webapp.conf to /tmp
   template:
@@ -16,5 +17,8 @@
     src: "{{ role_path }}/files/nginx.conf"
     dest: /etc/nginx/nginx.conf
 
-- shell: 'systemctl restart nginx'
-- shell: 'systemctl enable nginx'
+- name: Ensure nginx service is restarted and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+    enabled: true

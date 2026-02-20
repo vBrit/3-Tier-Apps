@@ -1,5 +1,8 @@
 ---
-- shell: 'tdnf -y install nginx'
+- name: Install nginx package
+  ansible.builtin.command: tdnf -y install nginx
+  args:
+    creates: /usr/sbin/nginx
 
 #- name: Wait 30 seconds
 #  ansible.builtin.pause:

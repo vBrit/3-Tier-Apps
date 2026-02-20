@@ -61,6 +61,26 @@
         msg: "✗ community.vmware collection is NOT installed - run: ansible-galaxy collection install community.vmware"
       when: vmware_collection_check.rc != 0
 
+    - name: Check collections requirements file exists
+      stat:
+        path: collections/requirements.yml
+      register: collections_requirements_stat
+
+    - name: Result - collections requirements file
+      debug:
+        msg: "✓ collections/requirements.yml exists"
+      when: collections_requirements_stat.stat.exists
+
+    - name: Check Python requirements file exists
+      stat:
+        path: requirements.txt
+      register: python_requirements_stat
+
+    - name: Result - Python requirements file
+      debug:
+        msg: "✓ requirements.txt exists"
+      when: python_requirements_stat.stat.exists
+
     - name: Check inventory file exists
       stat:
         path: inventories/production/inventory.yml
@@ -126,7 +146,7 @@
       when: all_vars is defined
 
     - name: Check deploy_ova_vms.yml has Photon OVA path configured
-      shell: grep -c "photon-hw11" playbooks/deploy_ova_vms.yml
+      shell: grep -E -c "ova:\s*/.*photon-hw" playbooks/deploy_ova_vms.yml
       register: photon_check
       ignore_errors: yes
       changed_when: false

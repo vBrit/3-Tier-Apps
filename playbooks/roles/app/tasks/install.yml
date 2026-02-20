@@ -1,5 +1,8 @@
 ---
-- shell: 'tdnf -y install httpd'
+- name: Install httpd package
+  ansible.builtin.command: tdnf -y install httpd
+  args:
+    creates: /usr/sbin/httpd
 #- shell: 'tdnf -y install sqlite'
 
 #- name: Wait 30 seconds

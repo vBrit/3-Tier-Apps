@@ -10,9 +10,22 @@
     src: templates/app-01a.conf
     dest: /tmp/app-01a.conf
 
-- shell: 'openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /tmp/app.key -out /tmp/app.pem -config /tmp/app-01a.conf'
-- shell: 'mv /tmp/app.key /etc/httpd/conf/server.key'
-- shell: 'mv /tmp/app.pem /etc/httpd/conf/server.crt'
+- name: Generate app TLS certificate and key
+  ansible.builtin.command: openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /tmp/app.key -out /tmp/app.pem -config /tmp/app-01a.conf
+
+- name: Install app TLS private key
+  ansible.builtin.copy:
+    src: /tmp/app.key
+    dest: /etc/httpd/conf/server.key
+    remote_src: true
+    mode: '0600'
+
+- name: Install app TLS certificate
+  ansible.builtin.copy:
+    src: /tmp/app.pem
+    dest: /etc/httpd/conf/server.crt
+    remote_src: true
+    mode: '0644'
 
 - name: Remove Old httpd.conf in /etc/httpd/
   ansible.builtin.file:
@@ -29,8 +42,11 @@
     src: files/httpd-ssl.conf
     dest: /etc/httpd/conf/extra/httpd-ssl.conf
 
-- shell: 'systemctl start httpd'
-- shell: 'systemctl enable httpd'
+- name: Ensure httpd service is started and enabled
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
 
 - name: Render templated app.py file
   template:
@@ -42,5 +58,8 @@
   copy:
     src: /tmp/app.py
     dest: /etc/httpd/cgi-bin/app.py
-    
-- shell: 'chmod 755 /etc/httpd/cgi-bin/app.py'
+
+- name: Set app.py executable mode
+  ansible.builtin.file:
+    path: /etc/httpd/cgi-bin/app.py
+    mode: '0755'
