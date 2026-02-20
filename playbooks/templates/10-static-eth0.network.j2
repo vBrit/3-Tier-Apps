@@ -5,7 +5,7 @@ Name=eth0
 Address={{ansible_host}}/24
 Gateway={{gateway}}
 DNS={{Common.DNS}}
-Domains=corp.local
+Domains={{ Common.Domain | default('corp.local') }}
 
 
 

@@ -4,6 +4,7 @@ Common:
     Physical: "CHANGE_ME_VCENTER_PASSWORD"           # vCenter account password
     VMs: "CHANGE_ME_VM_ROOT_PASSWORD"                # root password to set in deployed VMs
   DNS: "8.8.8.8"
+  Domain: "corp.local"                               # DNS search/domain suffix for hosts and cert SANs
   BaseNetwork:
     IPv4: '10.225'                                    # e.g. web hosts become 10.225.<SiteCode>.11/12/13
     SubnetMask: 24

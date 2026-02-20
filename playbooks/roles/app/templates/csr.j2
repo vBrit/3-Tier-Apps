@@ -8,12 +8,12 @@ ST = New Hampshire
 L = Salem
 O = WEI
 OU = Engineering
-CN = app-01a.corp.local
+CN = app-01a.{{ Common.Domain | default('corp.local') }}
 [v3_req]
 keyUsage = digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = app-01a.corp.local
+DNS.1 = app-01a.{{ Common.Domain | default('corp.local') }}
 DNS.2 = app-01a
 IP.1 = {{ansible_host}}
