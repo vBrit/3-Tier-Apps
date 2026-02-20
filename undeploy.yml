@@ -1,0 +1,43 @@
+##
+##
+---
+# Remove Web, App and DB Servers.
+- hosts: all
+  become: no
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Remove VMs from vCenter
+      community.vmware.vmware_guest:
+        hostname: "{{ Target.vCenter.FQDN }}"
+        username: "{{ Target.vCenter.User }}"
+        password: "{{ Common.Password.Physical }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        state: absent
+        force: yes
+      ignore_errors: yes
+
+# Clean up local templated files
+- hosts: 127.0.0.1
+  become: no
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Remove templated network config files
+      file:
+        path: "playbooks/templates/{{ item }}-10-static-eth0.network"
+        state: absent
+      with_items: "{{ groups['all'] }}"
+      ignore_errors: yes
+
+    - name: Remove templated hosts files
+      file:
+        path: "playbooks/templates/{{ item }}-hosts"
+        state: absent
+      with_items: "{{ groups['all'] }}"
+      ignore_errors: yes
+
+    - name: Display completion message
+      debug:
+        msg: "VMs have been removed from vCenter"
