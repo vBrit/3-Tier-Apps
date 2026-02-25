@@ -11,7 +11,7 @@ Ansible Controller - I used ubuntu 18
 
 Update `playbooks/deploy_ova_vms.yml` to point to the location of the Photon OS OVA on your Ansible controller (current default is Photon v5).
 
-NSX Segments named SEG-App, SEG-Web, SEG-DB.
+NSX Segments named SEG-App, SEG-Web, SEG-DB (or change them via `Common.PortGroups` in `all.yml`).
 
 Edit the inventory/production/group_vars/all.yml and update 
 
@@ -32,6 +32,29 @@ Do not commit `inventories/production/group_vars/all.yml` (local secrets/config 
 * DataCenter
 * Cluster
 * DataStore
+
+### Inventory variables
+
+PortGroups are now centralized in `inventories/production/group_vars/all.yml`:
+
+```yaml
+Common:
+  PortGroups:
+    app: "SEG-App"
+    db: "SEG-DB"
+    web: "SEG-Web"
+```
+
+Group vars (`app.yml`, `db.yml`, `web.yml`) consume these values.
+
+### Connection model (No SSH for role configuration)
+
+Role playbooks now run with `connection: local` and configure guests through VMware Guest Operations modules:
+
+* `community.vmware.vmware_vm_shell`
+* `community.vmware.vmware_guest_file_operation`
+
+Because of this, `open-vm-tools` must be installed and running in guest VMs. The bootstrap playbook (`playbooks/configure_vms.yml`) now installs `open-vm-tools` and enables `vmtoolsd` before role execution.
 
 ### Playbooks
 

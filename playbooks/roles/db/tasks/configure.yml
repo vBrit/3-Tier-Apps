@@ -1,51 +1,84 @@
 ---
-
-  - name: Create /etc/httpd/db directory
-    ansible.builtin.file:
+- name: Create /etc/httpd/db directory in guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    directory:
       path: /etc/httpd/db
-      state: directory
-
-  - name: Copy data.py into db server
-    ansible.builtin.copy:
-        src: files/data.py
-        dest: /etc/httpd/cgi-bin/data.py
-
-  - name: Copy clients.db /files/clients.db to /etc/httpd/
-    ansible.builtin.copy:
-      src: files/clients.db
-      dest: /etc/httpd/db/clients.db
-      
-  - name: Remove Old httpd.conf in /etc/httpd/
-    ansible.builtin.file:
-      path: /etc/httpd/conf/httpd.conf
-      state: absent
-
-  - name: Copy httpd.conf into /etc/httpd/
-    ansible.builtin.copy:
-      src: files/httpd.conf
-      dest: /etc/httpd/conf/httpd.conf
-      backup: yes
-
-  - name: Set ownership on db directory
-    ansible.builtin.file:
-      path: /etc/httpd/db
-      owner: apache
-      group: apache
+      operation: create
       recurse: true
+    validate_certs: false
+  delegate_to: localhost
 
-  - name: Set executable mode on data.py
-    ansible.builtin.file:
-      path: /etc/httpd/cgi-bin/data.py
-      mode: '0755'
+- name: Copy data.py into db guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/data.py"
+      dest: /etc/httpd/cgi-bin/data.py
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-  - name: Ensure httpd service is started and enabled
-    ansible.builtin.service:
-      name: httpd
-      state: started
-      enabled: true
+- name: Copy clients.db into db guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/clients.db"
+      dest: /etc/httpd/db/clients.db
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-####--exit-- Create a handler-------######
-  - name: Restart httpd after db configuration
-    ansible.builtin.service:
-      name: httpd
-      state: restarted
+- name: Copy db httpd.conf into guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/httpd.conf"
+      dest: /etc/httpd/conf/httpd.conf
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Set db permissions and restart httpd in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: >-
+      -lc "chown -R apache:apache /etc/httpd/db &&
+      chmod 755 /etc/httpd/cgi-bin/data.py &&
+      systemctl enable --now httpd &&
+      systemctl restart httpd"
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost

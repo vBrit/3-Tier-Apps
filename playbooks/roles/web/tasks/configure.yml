@@ -1,24 +1,115 @@
 ---
-- name: Create /etc/httpd/db directory
-  ansible.builtin.file:
-    path: /etc/nginx/ssl
-    state: directory
-    mode: '0755'
+- name: Create /etc/nginx/ssl directory in guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    directory:
+      path: /etc/nginx/ssl
+      operation: create
+      recurse: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Render webapp.conf to /tmp
-  template:
+- name: Render webapp.conf locally
+  ansible.builtin.template:
     src: webapp.conf
-    dest: /tmp/webapp.conf
+    dest: "/tmp/{{ inventory_hostname }}-webapp.conf"
+  delegate_to: localhost
 
-- shell: 'openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /etc/nginx/ssl/webapp.key -out /etc/nginx/ssl/webapp.pem -config /tmp/webapp.conf'
+- name: Copy webapp.conf into guest /tmp
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "/tmp/{{ inventory_hostname }}-webapp.conf"
+      dest: /tmp/webapp.conf
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Render nginx.conf to /etc/nginx/nginx.conf
-  template:
+- name: Generate nginx TLS certificate in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: >-
+      -lc "openssl req -x509 -nodes -days 1825 -newkey rsa:2048
+      -keyout /etc/nginx/ssl/webapp.key -out /etc/nginx/ssl/webapp.pem
+      -config /tmp/webapp.conf"
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Render nginx.conf locally
+  ansible.builtin.template:
     src: "{{ role_path }}/files/nginx.conf"
-    dest: /etc/nginx/nginx.conf
+    dest: "/tmp/{{ inventory_hostname }}-nginx.conf"
+  delegate_to: localhost
 
-- name: Ensure nginx service is restarted and enabled
-  ansible.builtin.service:
-    name: nginx
-    state: restarted
-    enabled: true
+- name: Copy rendered nginx.conf into guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "/tmp/{{ inventory_hostname }}-nginx.conf"
+      dest: /etc/nginx/nginx.conf
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Validate nginx configuration in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: "-lc \"nginx -t\""
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Ensure nginx is enabled and restarted in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: >-
+      -lc "chmod 600 /etc/nginx/ssl/webapp.key &&
+      chmod 644 /etc/nginx/ssl/webapp.pem &&
+      systemctl enable nginx &&
+      systemctl restart nginx"
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost

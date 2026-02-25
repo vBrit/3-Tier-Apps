@@ -1,65 +1,120 @@
 ---
-- name: Render templated network config file
-  template:
+- name: Render app CSR template locally
+  ansible.builtin.template:
     src: templates/csr.j2
-    dest: templates/app-01a.conf
+    dest: "/tmp/{{ inventory_hostname }}-app.conf"
   delegate_to: localhost
 
-- name: Copy app-01a.conf to /tmp
-  copy:
-    src: templates/app-01a.conf
-    dest: /tmp/app-01a.conf
+- name: Generate app TLS certificate and key locally
+  ansible.builtin.command: >-
+    openssl req -x509 -nodes -days 1825 -newkey rsa:2048
+    -keyout /tmp/{{ inventory_hostname }}-app.key
+    -out /tmp/{{ inventory_hostname }}-app.pem
+    -config /tmp/{{ inventory_hostname }}-app.conf
+  delegate_to: localhost
 
-- name: Generate app TLS certificate and key
-  ansible.builtin.command: openssl req -x509 -nodes -days 1825 -newkey rsa:2048 -keyout /tmp/app.key -out /tmp/app.pem -config /tmp/app-01a.conf
+- name: Copy app TLS private key to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "/tmp/{{ inventory_hostname }}-app.key"
+      dest: /etc/httpd/conf/server.key
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Install app TLS private key
-  ansible.builtin.copy:
-    src: /tmp/app.key
-    dest: /etc/httpd/conf/server.key
-    remote_src: true
-    mode: '0600'
+- name: Copy app TLS certificate to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "/tmp/{{ inventory_hostname }}-app.pem"
+      dest: /etc/httpd/conf/server.crt
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Install app TLS certificate
-  ansible.builtin.copy:
-    src: /tmp/app.pem
-    dest: /etc/httpd/conf/server.crt
-    remote_src: true
-    mode: '0644'
+- name: Copy app httpd.conf to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/httpd.conf"
+      dest: /etc/httpd/conf/httpd.conf
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Remove Old httpd.conf in /etc/httpd/
-  ansible.builtin.file:
-    path: /etc/httpd/conf/httpd.conf
-    state: absent
+- name: Copy app httpd-ssl.conf to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/httpd-ssl.conf"
+      dest: /etc/httpd/conf/extra/httpd-ssl.conf
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Copy httpd.conf to /etc/httpd/conf/
-  copy:
-    src: files/httpd.conf
-    dest: /etc/httpd/conf/httpd.conf
-
-- name: Copy httpd-ssl.conf to /etc/httpd/conf/extra/httpd-ssl.conf
-  copy:
-    src: files/httpd-ssl.conf
-    dest: /etc/httpd/conf/extra/httpd-ssl.conf
-
-- name: Ensure httpd service is started and enabled
-  ansible.builtin.service:
-    name: httpd
-    state: started
-    enabled: true
-
-- name: Render templated app.py file
-  template:
+- name: Render app.py locally
+  ansible.builtin.template:
     src: templates/app.j2
-    dest: /tmp/app.py
+    dest: "/tmp/{{ inventory_hostname }}-app.py"
   delegate_to: localhost
 
-- name: Copy app.py to /etc/httpd/cgi-bin/app.py
-  copy:
-    src: /tmp/app.py
-    dest: /etc/httpd/cgi-bin/app.py
+- name: Copy app.py to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "/tmp/{{ inventory_hostname }}-app.py"
+      dest: /etc/httpd/cgi-bin/app.py
+      overwrite: true
+    validate_certs: false
+  delegate_to: localhost
 
-- name: Set app.py executable mode
-  ansible.builtin.file:
-    path: /etc/httpd/cgi-bin/app.py
-    mode: '0755'
+- name: Fix app file permissions and start httpd in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: >-
+      -lc "chmod 600 /etc/httpd/conf/server.key &&
+      chmod 644 /etc/httpd/conf/server.crt &&
+      chmod 755 /etc/httpd/cgi-bin/app.py &&
+      systemctl enable --now httpd"
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost

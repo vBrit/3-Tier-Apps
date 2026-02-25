@@ -1,10 +1,16 @@
 ---
-- name: Install httpd package
-  ansible.builtin.command: tdnf -y install httpd
-  args:
-    creates: /usr/sbin/httpd
-#- shell: 'tdnf -y install sqlite'
-
-#- name: Wait 30 seconds
-#  ansible.builtin.pause:
-#    seconds: 30
+- name: Install httpd package without SSH
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: "-lc \"rpm -q httpd >/dev/null 2>&1 || tdnf -y install httpd\""
+    wait_for_process: true
+    timeout: 1800
+    validate_certs: false
+  delegate_to: localhost

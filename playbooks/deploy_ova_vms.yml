@@ -40,6 +40,6 @@
         wait: no
     - name: Wait for Photon to boot
       ansible.builtin.pause:
-        seconds: 40
+        seconds: 30
       run_once: true
 

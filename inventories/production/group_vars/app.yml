@@ -1,2 +1,2 @@
 gateway: "{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode + 1}}.1"
-PortGroup: "SEG-App"                                                              # Various PortGroups used during deployment
+PortGroup: "{{ Common.PortGroups.app }}"                                          # Various PortGroups used during deployment

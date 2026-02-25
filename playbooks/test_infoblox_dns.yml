@@ -1,0 +1,58 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Check Infoblox vars file exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../inventories/production/group_vars/infoblox.yml"
+      register: infoblox_vars_file
+
+    - name: Fail if Infoblox vars file is missing
+      ansible.builtin.fail:
+        msg: "Create inventories/production/group_vars/infoblox.yml from inventories/production/group_vars/infoblox.yml.template first."
+      when: not infoblox_vars_file.stat.exists
+
+    - name: Load Infoblox vars
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/../inventories/production/group_vars/infoblox.yml"
+
+    - name: Validate required Infoblox test variables
+      ansible.builtin.assert:
+        that:
+          - infoblox.provider.host is defined
+          - infoblox.provider.username is defined
+          - infoblox.provider.password is defined
+          - infoblox.record.name is defined
+          - infoblox.record.ipv4 is defined
+        fail_msg: "Populate inventories/production/group_vars/infoblox.yml before running this test playbook."
+
+    - name: Create/update test host record in Infoblox
+      infoblox.nios_modules.nios_host_record:
+        name: "{{ infoblox.record.name }}"
+        ipv4:
+          - ipv4addr: "{{ infoblox.record.ipv4 }}"
+        comment: "{{ infoblox.record.comment | default('Created by Ansible Infoblox test playbook') }}"
+        state: present
+        provider:
+          host: "{{ infoblox.provider.host }}"
+          username: "{{ infoblox.provider.username }}"
+          password: "{{ infoblox.provider.password }}"
+          ssl_verify: "{{ infoblox.provider.ssl_verify | default(false) }}"
+      register: infoblox_result
+
+    - name: Show Infoblox test result
+      ansible.builtin.debug:
+        var: infoblox_result
+
+    - name: Optional cleanup - remove test host record
+      infoblox.nios_modules.nios_host_record:
+        name: "{{ infoblox.record.name }}"
+        state: absent
+        provider:
+          host: "{{ infoblox.provider.host }}"
+          username: "{{ infoblox.provider.username }}"
+          password: "{{ infoblox.provider.password }}"
+          ssl_verify: "{{ infoblox.provider.ssl_verify | default(false) }}"
+      when: infoblox.cleanup_after_test | default(false)

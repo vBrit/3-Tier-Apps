@@ -8,6 +8,10 @@ Common:
   BaseNetwork:
     IPv4: '10.225'                                    # e.g. web hosts become 10.225.<SiteCode>.11/12/13
     SubnetMask: 24
+  PortGroups:
+    app: "SEG-App"
+    db: "SEG-DB"
+    web: "SEG-Web"
 
 Target:
   vCenter:

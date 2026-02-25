@@ -1,0 +1,14 @@
+# Copy this file to inventories/production/group_vars/infoblox.yml and fill in values.
+infoblox:
+  provider:
+    host: "infoblox.example.local"
+    username: "api-user"
+    password: "CHANGE_ME"
+    ssl_verify: false
+
+  record:
+    name: "test-host.wei-lab.com"
+    ipv4: "10.12.1.250"
+    comment: "Ansible Infoblox test"
+
+  cleanup_after_test: false

@@ -1,4 +1,7 @@
 ---
 - hosts: app
+  connection: local
+  become: no
+  gather_facts: false
   roles:
     - app
