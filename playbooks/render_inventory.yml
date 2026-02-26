@@ -1,0 +1,23 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  become: no
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/production/group_vars/all.yml"
+  tasks:
+    - name: Validate required hostname inputs
+      ansible.builtin.assert:
+        that:
+          - Common is defined
+          - Common.hostnames is defined
+          - Common.hostnames.app is defined
+          - Common.hostnames.db is defined
+          - Common.hostnames.web is defined
+          - Common.hostnames.web | length > 0
+        fail_msg: "Common.hostnames.app/db/web must be defined in inventories/production/group_vars/all.yml"
+
+    - name: Render inventory from Common.hostnames
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/inventory.yml.j2"
+        dest: "{{ playbook_dir }}/../inventories/production/inventory.yml"

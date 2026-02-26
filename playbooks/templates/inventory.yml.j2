@@ -1,0 +1,23 @@
+---
+all:
+  children:
+    web:
+      hosts:
+{% for web_host in Common.hostnames.web %}
+        {{ web_host }}:
+          ansible_host: "{{ '{{' }} Common.BaseNetwork.IPv4 {{ '}}' }}.{{ '{{' }} Common.SiteCode {{ '}}' }}.{{ 10 + loop.index }}"
+          ansible_python_interpreter: /usr/bin/python3
+{% endfor %}
+    db:
+      hosts:
+        {{ Common.hostnames.db }}:
+          ansible_host: "{{ '{{' }} Common.BaseNetwork.IPv4 {{ '}}' }}.{{ '{{' }} Common.SiteCode + 2 {{ '}}' }}.10"
+          ansible_python_interpreter: /usr/bin/python3
+    app:
+      hosts:
+        {{ Common.hostnames.app }}:
+          ansible_host: "{{ '{{' }} Common.BaseNetwork.IPv4 {{ '}}' }}.{{ '{{' }} Common.SiteCode + 1 {{ '}}' }}.10"
+          ansible_python_interpreter: /usr/bin/python3
+  vars:
+    ansible_user: "root"
+    ansible_password: "{{ '{{' }} Common.Password.VMs {{ '}}' }}"

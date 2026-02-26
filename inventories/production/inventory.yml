@@ -4,14 +4,24 @@ all:
     web:
       hosts:
         web-01b:
+          ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.11"
+          ansible_python_interpreter: /usr/bin/python3
         web-02b:
+          ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.12"
+          ansible_python_interpreter: /usr/bin/python3
         web-03b:
+          ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.13"
+          ansible_python_interpreter: /usr/bin/python3
     db:
       hosts:
         db-01b:
+          ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode + 2 }}.10"
+          ansible_python_interpreter: /usr/bin/python3
     app:
       hosts:
         app-01b:
+          ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode + 1 }}.10"
+          ansible_python_interpreter: /usr/bin/python3
   vars:
     ansible_user: "root"
     ansible_password: "{{ Common.Password.VMs }}"

@@ -87,6 +87,19 @@ ansible-playbook -i inventories/production/inventory.yml playbooks/install_confi
 
 ### Playbooks
 
+Render inventory aliases from `Common.hostnames` before deploy/undeploy:
+
+```bash
+ansible-playbook -i localhost, playbooks/render_inventory.yml
+```
+
+Or use wrappers that automatically render first:
+
+```bash
+./deploy.sh
+./undeploy.sh
+```
+
 ansible-playbook -i inventories/production/inventory.yml deploy.yml
 
 ## Pre-requisite Steps
