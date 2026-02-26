@@ -12,10 +12,29 @@ webservers = {
   '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13': 'web-03a'
  }
 
-print("Content-type:text/html\n\n")
-print("<head><title>Customer Database</title></head>\n")
+print("Content-type:text/html; charset=utf-8\n\n")
+print("<head><title>Planetary Database</title>")
+print("<style>")
+print("body { font-family: Arial, sans-serif; background: #f6f8fb; color: #1f2937; }")
+print("h1 { color: #0f172a; }")
+print("table { border-collapse: collapse; width: 100%; background: #ffffff; }")
+print("th { background: #1e3a8a; color: #ffffff; text-align: left; }")
+print("th, td { border: 1px solid #cbd5e1; padding: 8px; }")
+print("tr.planet-default { background: #f8fafc; }")
+print("tr.planet-sun { background: #fef9c3; color: #854d0e; font-weight: 700; }")
+print("tr.planet-mercury { background: #e5e7eb; color: #1f2937; }")
+print("tr.planet-venus { background: #fde68a; color: #78350f; }")
+print("tr.planet-earth { background: #dcfce7; color: #14532d; }")
+print("tr.planet-mars { background: #fee2e2; color: #7f1d1d; }")
+print("tr.planet-jupiter { background: #ffedd5; color: #9a3412; }")
+print("tr.planet-saturn { background: #fef3c7; color: #92400e; }")
+print("tr.planet-uranus { background: #cffafe; color: #155e75; }")
+print("tr.planet-neptune { background: #dbeafe; color: #1e3a8a; }")
+print("tr.moon-row { background: #ecfeff; color: #155e75; }")
+print("tr.star-row { background: #fef3c7; color: #92400e; font-weight: 600; }")
+print("</style></head>\n")
 print("<body>\n")
-print("<h1>Customer Database Access</h1>\n")
+print("<h1>Planetary Database Access (Sorted by Distance from Sun in AU)</h1>\n")
 
 remote = os.getenv("REMOTE_ADDR")
 form = cgi.FieldStorage()
@@ -37,23 +56,63 @@ else:
 r = requests.get(url)
 
 print('<form action="/cgi-bin/app.py">')
-print(' Name Filter (blank for all records):')
+print(' Planet Filter (blank for all records):')
 print(' <input type="text" name="querystring" value="'+querystring+'">')
 print(' <input type="submit" value="Apply">')
 print('</form>')
 
-print("\n<table border=1 bordercolor=black cellpadding=5 cellspacing=0>")
+print("\n<table>")
 
-print("\n<th>Rank</th><th>Name</th><th>Universe</th><th>Revenue</th>")
+print("\n<th>Planet</th><th>Distance from Sun (AU)</th><th>Number of Moons</th><th>Diameter (miles)</th><th>Moon Names + Diameters (miles)</th><th>Nearest 10 Stars to the Sun (light years)</th>")
 
 # deal with the data coming across the wire
-a = r.text.split("|\n#")
-for row in a:
-    if len(row) != 1:
-        print("<tr>")
-        splitrow = row.split("|")
-        for item in splitrow:
-            if item != None:
-                print("<td>",item,"</td>")
-        print("</tr>\n")
-    print("</body></html>\n")
+rows = [line for line in r.text.splitlines() if line.strip() != ""]
+planet_classes = {
+    "sun": "planet-sun",
+    "mercury": "planet-mercury",
+    "venus": "planet-venus",
+    "earth": "planet-earth",
+    "mars": "planet-mars",
+    "jupiter": "planet-jupiter",
+    "saturn": "planet-saturn",
+    "uranus": "planet-uranus",
+    "neptune": "planet-neptune",
+}
+
+for row in rows:
+    splitrow = row.split("\t")
+    if len(splitrow) < 6:
+        continue
+
+    planet = splitrow[0]
+    distance_au = splitrow[1]
+    moon_count = splitrow[2]
+    diameter_miles = splitrow[3]
+    moon_details = splitrow[4]
+    star_details = splitrow[5]
+
+    row_class = planet_classes.get(planet.lower(), "planet-default")
+    print('<tr class="' + row_class + '">')
+    print("<td>", planet, "</td>")
+    print("<td>", distance_au, "</td>")
+    print("<td>", moon_count, "</td>")
+    print("<td>", diameter_miles, "</td>")
+    print("<td>", "", "</td>")
+    print("<td>", "", "</td>")
+    print("</tr>\n")
+
+    if moon_details not in ["—", "", "None", "none", "N/A"]:
+        for moon in [m.strip() for m in moon_details.split("|") if m.strip() != ""]:
+            print('<tr class="' + row_class + '">')
+            print("<td></td><td></td><td></td><td></td>")
+            print("<td>", moon, "</td><td></td>")
+            print("</tr>\n")
+
+    if planet == "Sun" and star_details not in ["—", "", "None", "none", "N/A"]:
+        for star in [s.strip() for s in star_details.split("|") if s.strip() != ""]:
+            print('<tr class="star-row">')
+            print("<td></td><td></td><td></td><td></td><td></td>")
+            print("<td>", star, "</td>")
+            print("</tr>\n")
+
+print("</body></html>\n")

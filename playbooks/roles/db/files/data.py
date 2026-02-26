@@ -8,20 +8,20 @@ import sqlite3
 conn = sqlite3.connect('/etc/httpd/db/clients.db')
 curs = conn.cursor()
 
-print("Content-type:text/plain\n\n")
+print("Content-type:text/plain; charset=utf-8\n\n")
 
 form = cgi.FieldStorage()
 querystring = form.getvalue("querystring")
-if querystring != None:
-    queryval = "%" + querystring + "%"
-    select = "SELECT * FROM clients WHERE name LIKE '" + queryval + "'"
+if querystring is not None and querystring.strip() != "":
+    queryval = "%" + querystring.strip() + "%"
+    select = "SELECT Planet, DistanceFromSunAU, Moons, DiameterMiles, MoonDetails, StarDetails FROM planets WHERE Planet LIKE ? ORDER BY DistanceFromSunAU ASC"
+    rows = curs.execute(select, (queryval,))
 else:
-    select = "SELECT * FROM clients"
+    select = "SELECT Planet, DistanceFromSunAU, Moons, DiameterMiles, MoonDetails, StarDetails FROM planets ORDER BY DistanceFromSunAU ASC"
+    rows = curs.execute(select)
 
-for row in curs.execute(select):
-    if len(row) == 4:
-        for item in row:
-            print(item,'|')
-        print("#")
+for row in rows:
+    if len(row) == 6:
+        print("\t".join(str(item) for item in row))
 
 conn.close()
