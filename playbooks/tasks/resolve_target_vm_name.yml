@@ -1,0 +1,24 @@
+---
+- name: Capture original inventory hostname
+  ansible.builtin.set_fact:
+    original_inventory_hostname: "{{ inventory_hostname }}"
+
+- name: Build web hostname map from inventory aliases to configured hostnames
+  ansible.builtin.set_fact:
+    web_hostname_map: "{{ dict((groups.get('web', [])) | zip(Common.hostnames.web | default(groups.get('web', [])))) }}"
+
+- name: Resolve target VM name from Common.hostnames
+  ansible.builtin.set_fact:
+    target_vm_name: >-
+      {{
+        (Common.hostnames.app | default(original_inventory_hostname))
+        if 'app' in group_names else
+        ((Common.hostnames.db | default(original_inventory_hostname))
+        if 'db' in group_names else
+        ((web_hostname_map[original_inventory_hostname] | default(original_inventory_hostname))
+        if 'web' in group_names else original_inventory_hostname))
+      }}
+
+- name: Override inventory_hostname for downstream VMware module lookups
+  ansible.builtin.set_fact:
+    inventory_hostname: "{{ target_vm_name }}"

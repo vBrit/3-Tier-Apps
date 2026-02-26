@@ -3,6 +3,8 @@
   connection: local
   become: no
   gather_facts: False
+  pre_tasks:
+    - import_tasks: tasks/resolve_target_vm_name.yml
   tasks:
     - name: Walk through the setup dialog 1 (Enter 'root' username)
       community.vmware.vmware_guest_sendkey:

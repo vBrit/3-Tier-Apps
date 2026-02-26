@@ -3,15 +3,15 @@ all:
   children:
     web:
       hosts:
-        web-01a:
-        web-02a:
-        web-03a:
+        web-01b:
+        web-02b:
+        web-03b:
     db:
       hosts:
-        db-01a:
+        db-01b:
     app:
       hosts:
-        app-01a:
+        app-01b:
   vars:
     ansible_user: "root"
     ansible_password: "{{ Common.Password.VMs }}"

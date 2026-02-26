@@ -28,10 +28,13 @@ def safe_list(raw, sep="|"):
     return [x.strip() for x in str(raw).split(sep) if x.strip()]
 
 webservers = {
-  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11': 'web-01a',
-  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12': 'web-02a',
-  '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13': 'web-03a'
+{% for web_host in (Common.hostnames.web | default(groups.get('web', []))) %}
+  '{{ hostvars[web_host].ansible_host | default(web_host) }}': '{{ web_host }}'{% if not loop.last %},{% endif %}
+{% endfor %}
 }
+
+db_host = "{{ Common.hostnames.db | default(groups.get('db', ['db-01a'])[0]) }}"
+db_port = "{{ Common.Services.DBPort | default('3306') }}"
 
 planet_icon_files = {
   "sun": "sun.png",
@@ -355,9 +358,9 @@ print('</form>')
 
 # fetch data
 if querystring is not None and querystring != "":
-    url = 'http://db-01a:3306/cgi-bin/data.py?querystring=' + querystring
+    url = f'http://{db_host}:{db_port}/cgi-bin/data.py?querystring=' + querystring
 else:
-    url = 'http://db-01a:3306/cgi-bin/data.py'
+    url = f'http://{db_host}:{db_port}/cgi-bin/data.py'
     querystring = ""
 
 try:

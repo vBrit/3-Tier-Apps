@@ -12,6 +12,13 @@ Common:
     app: "SEG-App"
     db: "SEG-DB"
     web: "SEG-Web"
+  hostnames:
+    app: "app-01b"                                 # Primary app hostname used by web proxy and certs
+    db: "db-01b"                                   # DB hostname used by app data endpoint
+    web:                                            # Web hostnames used in app access labels and web cert SANs
+      - "web-01b"
+      - "web-02b"
+      - "web-03b"
 
 Target:
   vCenter:

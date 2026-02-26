@@ -6,6 +6,8 @@
   become: no
   connection: local
   gather_facts: False
+  pre_tasks:
+    - import_tasks: playbooks/tasks/resolve_target_vm_name.yml
   tasks:
     - name: Remove VMs from vCenter
       community.vmware.vmware_guest:
@@ -23,19 +25,29 @@
   become: no
   connection: local
   gather_facts: False
+  vars:
+    rendered_template_hosts: >-
+      {{
+        (
+          [Common.hostnames.app | default(groups.get('app', ['app-01a'])[0])] +
+          [Common.hostnames.db | default(groups.get('db', ['db-01a'])[0])] +
+          (Common.hostnames.web | default(groups.get('web', []))) +
+          groups.get('all', [])
+        ) | unique
+      }}
   tasks:
     - name: Remove templated network config files
       file:
         path: "playbooks/templates/{{ item }}-10-static-eth0.network"
         state: absent
-      with_items: "{{ groups['all'] }}"
+      with_items: "{{ rendered_template_hosts }}"
       ignore_errors: yes
 
     - name: Remove templated hosts files
       file:
         path: "playbooks/templates/{{ item }}-hosts"
         state: absent
-      with_items: "{{ groups['all'] }}"
+      with_items: "{{ rendered_template_hosts }}"
       ignore_errors: yes
 
     - name: Display completion message

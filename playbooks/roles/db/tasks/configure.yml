@@ -47,6 +47,12 @@
     validate_certs: false
   delegate_to: localhost
 
+- name: Render db httpd.conf locally
+  ansible.builtin.template:
+    src: "{{ role_path }}/files/httpd.conf"
+    dest: "/tmp/{{ inventory_hostname }}-db-httpd.conf"
+  delegate_to: localhost
+
 - name: Copy db httpd.conf into guest
   community.vmware.vmware_guest_file_operation:
     hostname: "{{ Target.vCenter.FQDN }}"
@@ -57,7 +63,7 @@
     vm_username: "root"
     vm_password: "{{ Common.Password.VMs }}"
     copy:
-      src: "{{ role_path }}/files/httpd.conf"
+      src: "/tmp/{{ inventory_hostname }}-db-httpd.conf"
       dest: /etc/httpd/conf/httpd.conf
       overwrite: true
     validate_certs: false

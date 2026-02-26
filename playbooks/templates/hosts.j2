@@ -6,8 +6,21 @@ Begin /etc/hosts (network card version)
 
 # End /etc/hosts (network card version)  
 
+{% set app_hosts = groups.get('app', []) %}
+{% set db_hosts = groups.get('db', []) %}
+{% set web_hosts = groups.get('web', []) %}
+{% set web_hostname_map = dict(web_hosts | zip(Common.hostnames.web | default(web_hosts))) %}
+
 {% for hostname, vars in hostvars.items() %}
 {% if vars.get("ansible_host") is not none %}
-{{ vars["ansible_host"] }}  {{ hostname }}.{{ Common.Domain | default('corp.local') }} {{ hostname }}
+{% set resolved_hostname = hostname %}
+{% if hostname in app_hosts %}
+{% set resolved_hostname = Common.hostnames.app | default(hostname) %}
+{% elif hostname in db_hosts %}
+{% set resolved_hostname = Common.hostnames.db | default(hostname) %}
+{% elif hostname in web_hosts %}
+{% set resolved_hostname = web_hostname_map[hostname] | default(hostname) %}
+{% endif %}
+{{ vars["ansible_host"] }}  {{ resolved_hostname }}.{{ Common.Domain | default('corp.local') }} {{ resolved_hostname }}
 {% endif %}
 {% endfor %}
