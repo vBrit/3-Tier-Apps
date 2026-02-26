@@ -1,84 +1,389 @@
 #!/usr/bin/env python3
-
 # app.py - script used to process database results for presentation
 
 import os
 import cgi
+import html
+import base64
 import requests
+
+def fmt_int(value):
+    try:
+        return f"{int(float(value)):,}"
+    except Exception:
+        return value
+
+def fmt_au(value):
+    try:
+        return f"{float(value):.2f}".rstrip("0").rstrip(".")
+    except Exception:
+        return value
+
+def esc(value):
+    return html.escape(str(value), quote=True)
+
+def safe_list(raw, sep="|"):
+    if raw in ["—", "", "None", "none", "N/A", None]:
+        return []
+    return [x.strip() for x in str(raw).split(sep) if x.strip()]
 
 webservers = {
   '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.11': 'web-01a',
   '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.12': 'web-02a',
   '{{Common.BaseNetwork.IPv4}}.{{Common.SiteCode}}.13': 'web-03a'
- }
+}
 
+planet_icon_files = {
+  "sun": "sun.png",
+  "mercury": "mercury.png",
+  "venus": "venus.png",
+  "earth": "earth.png",
+  "mars": "mars.png",
+  "jupiter": "jupiter.png",
+  "saturn": "saturn.png",
+  "uranus": "uranus.png",
+  "neptune": "neptune.png",
+  "pluto": "pluto_or_asteroid.png",
+  "moon": "moon.png",
+}
+
+ICON_BASE_PATH = "/etc/httpd/html/icons"
+
+icon_data_uri_cache = {}
+
+planet_badges = {
+    "sun": "badge-sun",
+    "mercury": "badge-rock",
+    "venus": "badge-rock",
+    "earth": "badge-rock",
+    "mars": "badge-rock",
+    "jupiter": "badge-gas",
+    "saturn": "badge-gas",
+    "uranus": "badge-ice",
+    "neptune": "badge-ice",
+  "pluto": "badge-dwarf",
+}
+
+def row_id_from_planet(name):
+    return "p_" + "".join(ch.lower() for ch in str(name) if ch.isalnum() or ch in ['_', '-'])
+
+def planet_key(name):
+  return str(name).strip().lower()
+
+def icon_data_uri_for_planet(name):
+  key = planet_key(name)
+  if key in icon_data_uri_cache:
+    return icon_data_uri_cache[key]
+
+  filename = planet_icon_files.get(key)
+  if not filename:
+    icon_data_uri_cache[key] = None
+    return None
+
+  try:
+    with open(f"{ICON_BASE_PATH}/{filename}", "rb") as icon_file:
+      encoded = base64.b64encode(icon_file.read()).decode("ascii")
+    mime = "image/png" if filename.lower().endswith(".png") else "image/svg+xml"
+    value = f"data:{mime};base64,{encoded}"
+    icon_data_uri_cache[key] = value
+    return value
+  except Exception:
+    icon_data_uri_cache[key] = None
+    return None
+
+def icon_fallback_for_planet(name):
+  clean = str(name).strip()
+  return clean[:1].upper() if clean else "•"
+
+# --- CGI output ---
 print("Content-type:text/html; charset=utf-8\n\n")
-print("<head><title>Planetary Database</title>")
-print("<style>")
-print("body { font-family: Arial, sans-serif; background: #f6f8fb; color: #1f2937; }")
-print("h1 { color: #0f172a; }")
-print("table { border-collapse: collapse; width: 100%; background: #ffffff; }")
-print("th { background: #1e3a8a; color: #ffffff; text-align: left; }")
-print("th, td { border: 1px solid #cbd5e1; padding: 8px; }")
-print("tr.planet-default { background: #f8fafc; }")
-print("tr.planet-sun { background: #fef9c3; color: #854d0e; font-weight: 700; }")
-print("tr.planet-mercury { background: #e5e7eb; color: #1f2937; }")
-print("tr.planet-venus { background: #fde68a; color: #78350f; }")
-print("tr.planet-earth { background: #dcfce7; color: #14532d; }")
-print("tr.planet-mars { background: #fee2e2; color: #7f1d1d; }")
-print("tr.planet-jupiter { background: #ffedd5; color: #9a3412; }")
-print("tr.planet-saturn { background: #fef3c7; color: #92400e; }")
-print("tr.planet-uranus { background: #cffafe; color: #155e75; }")
-print("tr.planet-neptune { background: #dbeafe; color: #1e3a8a; }")
-print("tr.moon-row { background: #ecfeff; color: #155e75; }")
-print("tr.star-row { background: #fef3c7; color: #92400e; font-weight: 600; }")
-print("</style></head>\n")
-print("<body>\n")
-print("<h1>Planetary Database Access (Sorted by Distance from Sun in AU)</h1>\n")
+
+print("""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Planetary Database</title>
+<style>
+:root{
+  --bg: #0b1220;
+  --panel: rgba(15, 26, 43, 0.92);
+  --panel2: rgba(10, 18, 34, 0.92);
+  --text: #e6edf7;
+  --muted: #9fb0c3;
+  --border: rgba(255,255,255,.08);
+  --row: rgba(255,255,255,.03);
+  --rowAlt: rgba(255,255,255,.055);
+  --accent: #4f8cff;
+  --shadow: 0 18px 45px rgba(0,0,0,.35);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 700px at 10% 0%, #16203b 0%, #0b1128 55%, #060a1a 100%);
+}
+.shell{ max-width: 1450px; margin: 18px auto; padding: 0 14px 28px; }
+
+.header{ display:flex; align-items:center; gap:12px; margin: 6px 0 10px; }
+.logo{
+  width:34px; height:34px; border-radius:10px;
+  display:grid; place-items:center;
+  background: linear-gradient(180deg, rgba(79,140,255,.35), rgba(79,140,255,.12));
+  border:1px solid rgba(79,140,255,.25);
+  box-shadow: 0 10px 25px rgba(79,140,255,.12);
+}
+.logo .dot{
+  width:10px; height:10px; border-radius:999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(79,140,255,.18), 0 0 22px rgba(79,140,255,.35);
+}
+h1{ margin:0; font-size: 34px; font-weight: 750; letter-spacing: .2px; }
+.sub{ color: var(--muted); font-weight: 560; font-size: 22px; }
+.smalltop{ margin: 2px 0 10px; color: rgba(230,237,247,.65); font-size: 12px; }
+
+.toolbar{
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+.toolbar form{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0; }
+label{ color: var(--muted); font-size: 13px; }
+.field{
+  display:flex; align-items:center;
+  background: rgba(8, 14, 28, .65);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow:hidden;
+}
+.field input{
+  min-width: 340px;
+  padding: 10px 12px;
+  border:0; outline:0;
+  background: transparent;
+  color: var(--text);
+}
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(79,140,255,.32);
+  background: linear-gradient(180deg, rgba(79,140,255,.95), rgba(46,98,214,.92));
+  color:#fff;
+  font-weight: 700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.btn.secondary{
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 650;
+}
+.results{ color: var(--muted); font-size: 13px; white-space:nowrap; }
+
+.table-wrap{
+  margin-top: 12px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+table{ width: 100%; border-collapse: separate; border-spacing: 0; }
+thead th{
+  position: sticky; top: 0; z-index: 5;
+  background: linear-gradient(to bottom, rgba(79,140,255,.22), rgba(15,26,43,1));
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  padding: 12px 12px;
+  white-space: nowrap;
+}
+tbody tr{ background: var(--row); }
+tbody tr:nth-child(even){ background: var(--rowAlt); }
+tbody td{
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  vertical-align: top;
+}
+th.num, td.num{ text-align:right; font-variant-numeric: tabular-nums; }
+
+tbody tr:hover td{ background: rgba(79,140,255,.10); }
+
+.namecell{ display:flex; align-items:center; gap:10px; }
+.toggle{
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  display:grid; place-items:center;
+  cursor:pointer;
+  user-select:none;
+}
+.toggle:hover{ background: rgba(79,140,255,.14); border-color: rgba(79,140,255,.25); }
+
+.icon{
+  width: 22px; height: 22px;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  display:grid; place-items:center;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: rgba(230,237,247,.92);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.icon-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.planet{ font-weight: 700; }
+
+.badge{
+  margin-left: 8px;
+  display:inline-flex;
+  align-items:center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+}
+.badge-sun{ border-color: rgba(255,193,7,.25); background: rgba(255,193,7,.10); color: rgba(255,224,160,.95); }
+.badge-rock{ border-color: rgba(79,140,255,.25); background: rgba(79,140,255,.10); color: rgba(210,226,255,.95); }
+.badge-gas{ border-color: rgba(255,153,102,.25); background: rgba(255,153,102,.10); color: rgba(255,221,204,.95); }
+.badge-ice{ border-color: rgba(102,204,255,.25); background: rgba(102,204,255,.10); color: rgba(210,246,255,.95); }
+.badge-dwarf{ border-color: rgba(189,195,204,.28); background: rgba(189,195,204,.12); color: rgba(229,233,239,.96); }
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--border);
+  margin: 2px 6px 2px 0;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.muted{ color: var(--muted); font-size: 11px; }
+
+/* child rows (moons/stars under planet) */
+.child-row td{
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+.child-row td:not(:first-child){ color: transparent; } /* keep columns aligned but visually empty */
+.child-row .child-cell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-left: 46px; /* aligns under planet name (after toggle+icon) */
+  color: rgba(230,237,247,.92);
+}
+.child-dot{
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: rgba(230,237,247,.35);
+}
+.child-icon{
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.child-star{
+  color: rgba(255,214,92,.95);
+  font-size: 12px;
+  margin-right: 2px;
+}
+.hidden{ display:none; }
+
+@media (max-width: 980px){
+  .field input{ min-width: 220px; }
+  .sub{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <div class="logo" aria-hidden="true"><div class="dot"></div></div>
+    <div>
+      <h1>Planetary Database Access <span class="sub">(Sorted by Distance from Sun in AU)</span></h1>
+    </div>
+  </div>
+""")
 
 remote = os.getenv("REMOTE_ADDR")
 form = cgi.FieldStorage()
 querystring = form.getvalue("querystring")
 
-if remote in webservers:
-    accessName = webservers[remote]
-else:
-    accessName = remote
+accessName = webservers.get(remote, remote if remote else "unknown")
+print(f"<div class='smalltop'>Accessed via: {esc(accessName)}</div>")
 
-print("Accessed via:", accessName, "\n<p>")
+print("<div class='toolbar'>")
+print('<form action="/cgi-bin/app.py" method="get">')
+print('<label for="querystring">Planet:</label>')
+print('<div class="field">')
+print('  <input type="text" name="querystring" placeholder="Filter records..." value="'+esc(querystring if querystring is not None else "")+'">')
+print('</div>')
+print(' <button class="btn" type="submit">Apply</button>')
+print(' <a class="btn secondary" href="/cgi-bin/app.py">Clear</a>')
+print('</form>')
 
-if querystring != None:
+# fetch data
+if querystring is not None and querystring != "":
     url = 'http://db-01a:3306/cgi-bin/data.py?querystring=' + querystring
 else:
     url = 'http://db-01a:3306/cgi-bin/data.py'
     querystring = ""
 
-r = requests.get(url)
+try:
+    r = requests.get(url, timeout=10)
+    r.raise_for_status()
+    rows = [line for line in r.text.splitlines() if line.strip() != ""]
+except Exception as e:
+    rows = []
+    print(f"<div class='results'>Error loading data: {esc(e)}</div>")
+    print("</div></div></body></html>")
+    raise SystemExit
 
-print('<form action="/cgi-bin/app.py">')
-print(' Planet Filter (blank for all records):')
-print(' <input type="text" name="querystring" value="'+querystring+'">')
-print(' <input type="submit" value="Apply">')
-print('</form>')
+print(f"<div class='results'>Showing {len(rows)} results</div>")
+print("</div>")  # toolbar
 
-print("\n<table>")
+print("<div class='table-wrap'>")
+print("<table>")
+print("<thead><tr>")
+print("<th>Planet</th>")
+print("<th class='num'>Distance from Sun (AU)</th>")
+print("<th class='num'>Number of Moons</th>")
+print("<th class='num'>Diameter (miles)</th>")
+print("</tr></thead>")
+print("<tbody>")
 
-print("\n<th>Planet</th><th>Distance from Sun (AU)</th><th>Number of Moons</th><th>Diameter (miles)</th><th>Moon Names + Diameters (miles)</th><th>Nearest 10 Stars to the Sun (light years)</th>")
-
-# deal with the data coming across the wire
-rows = [line for line in r.text.splitlines() if line.strip() != ""]
-planet_classes = {
-    "sun": "planet-sun",
-    "mercury": "planet-mercury",
-    "venus": "planet-venus",
-    "earth": "planet-earth",
-    "mars": "planet-mars",
-    "jupiter": "planet-jupiter",
-    "saturn": "planet-saturn",
-    "uranus": "planet-uranus",
-    "neptune": "planet-neptune",
-}
-
+# Render: planet row, then child moon rows, then child star rows (Sun only)
 for row in rows:
     splitrow = row.split("\t")
     if len(splitrow) < 6:
@@ -91,28 +396,96 @@ for row in rows:
     moon_details = splitrow[4]
     star_details = splitrow[5]
 
-    row_class = planet_classes.get(planet.lower(), "planet-default")
-    print('<tr class="' + row_class + '">')
-    print("<td>", planet, "</td>")
-    print("<td>", distance_au, "</td>")
-    print("<td>", moon_count, "</td>")
-    print("<td>", diameter_miles, "</td>")
-    print("<td>", "", "</td>")
-    print("<td>", "", "</td>")
-    print("</tr>\n")
+    pid = row_id_from_planet(planet)
+    moons = safe_list(moon_details, sep="|")
+    stars = safe_list(star_details, sep="|") if planet_key(planet) == "sun" else []
 
-    if moon_details not in ["—", "", "None", "none", "N/A"]:
-        for moon in [m.strip() for m in moon_details.split("|") if m.strip() != ""]:
-            print('<tr class="' + row_class + '">')
-            print("<td></td><td></td><td></td><td></td>")
-            print("<td>", moon, "</td><td></td>")
-            print("</tr>\n")
+    icon_data_uri = icon_data_uri_for_planet(planet)
+    moon_icon_data_uri = icon_data_uri_for_planet("moon")
+    icon_fallback = icon_fallback_for_planet(planet)
+    badge_class = planet_badges.get(planet_key(planet), "")
 
-    if planet == "Sun" and star_details not in ["—", "", "None", "none", "N/A"]:
-        for star in [s.strip() for s in star_details.split("|") if s.strip() != ""]:
-            print('<tr class="star-row">')
-            print("<td></td><td></td><td></td><td></td><td></td>")
-            print("<td>", star, "</td>")
-            print("</tr>\n")
+    has_children = (len(moons) > 0) or (len(stars) > 0)
 
-print("</body></html>\n")
+    # --- planet row ---
+    print(f"<tr id='{pid}'>")
+    print("<td>")
+    print("<div class='namecell'>")
+    if has_children:
+      # default collapsed; click to expand
+      print(f"<button class='toggle' onclick=\"toggleChildren('{pid}', this)\" aria-label='Toggle children'>+</button>")
+    else:
+        print("<span style='width:26px;display:inline-block'></span>")
+    if icon_data_uri:
+      print(f"<span class='icon' aria-hidden='true'>{esc(icon_fallback)}<img class='icon-img' src='{esc(icon_data_uri)}' alt=''></span>")
+    else:
+      print(f"<span class='icon' aria-hidden='true'>{esc(icon_fallback)}</span>")
+    print(f"<span class='planet'>{esc(planet)}</span>")
+    if badge_class:
+        label = {
+            "badge-sun": "Star",
+            "badge-rock": "Rocky",
+            "badge-gas": "Gas Giant",
+            "badge-ice": "Ice Giant",
+            "badge-dwarf": "Dwarf"
+        }.get(badge_class, "Type")
+        print(f"<span class='badge {badge_class}'>{label}</span>")
+    print("</div>")
+    print("</td>")
+
+    print(f"<td class='num'>{esc(fmt_au(distance_au))}</td>")
+    print(f"<td class='num'>{esc(fmt_int(moon_count))}</td>")
+    print(f"<td class='num'>{esc(fmt_int(diameter_miles))}</td>")
+
+    print("</tr>")
+
+    # --- moon child rows (under planet) ---
+    if moons:
+      for m in moons:
+        # start hidden (collapsed)
+        print(f"<tr class='child-row child-{pid} hidden'>")
+        print("<td>")
+        print("<div class='child-cell'>")
+        if moon_icon_data_uri:
+          print(f"<img class='child-icon' src='{esc(moon_icon_data_uri)}' alt=''>")
+        else:
+          print("<span class='child-dot' aria-hidden='true'></span>")
+        # show moon as plain text here (like screenshot list under planet)
+        print(f"<span>{esc(m)}</span>")
+        print("</div>")
+        print("</td>")
+        print("<td></td><td></td><td></td>")
+        print("</tr>")
+
+    # --- star child rows (Sun only) ---
+    if stars:
+      for s in stars:
+        print(f"<tr class='child-row child-{pid} hidden'>")
+        print("<td>")
+        print("<div class='child-cell'>")
+        print("<span class='child-star' aria-hidden='true'>★</span>")
+        print(f"<span>{esc(s)}</span>")
+        print("</div>")
+        print("</td>")
+        print("<td></td><td></td><td></td>")
+        print("</tr>")
+
+print("</tbody></table></div>")
+
+print("""
+<script>
+function toggleChildren(pid, btn){
+  const rows = document.querySelectorAll('.child-' + pid);
+  if(!rows.length) return;
+  const isHidden = rows[0].classList.contains('hidden');
+  rows.forEach(r => {
+    if(isHidden) r.classList.remove('hidden');
+    else r.classList.add('hidden');
+  });
+  btn.textContent = isHidden ? '−' : '+';
+}
+</script>
+</div>
+</body>
+</html>
+""")

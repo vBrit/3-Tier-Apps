@@ -99,6 +99,61 @@
     validate_certs: false
   delegate_to: localhost
 
+- name: Ensure app icon directory exists in guest
+  community.vmware.vmware_vm_shell:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    vm_shell: "/bin/bash"
+    vm_shell_args: >-
+      -lc "mkdir -p /etc/httpd/html/icons"
+    wait_for_process: true
+    timeout: 1200
+    validate_certs: false
+  delegate_to: localhost
+
+- name: Copy planet icon assets to guest
+  community.vmware.vmware_guest_file_operation:
+    hostname: "{{ Target.vCenter.FQDN }}"
+    username: "{{ Target.vCenter.User }}"
+    password: "{{ Common.Password.Physical }}"
+    datacenter: "{{ Target.vCenter.DataCenter }}"
+    vm_id: "{{ inventory_hostname }}"
+    vm_username: "root"
+    vm_password: "{{ Common.Password.VMs }}"
+    copy:
+      src: "{{ role_path }}/files/icons/{{ item }}"
+      dest: "/etc/httpd/html/icons/{{ item }}"
+      overwrite: true
+    validate_certs: false
+  loop:
+    - sun.png
+    - mercury.png
+    - venus.png
+    - earth.png
+    - mars.png
+    - jupiter.png
+    - saturn.png
+    - uranus.png
+    - neptune.png
+    - pluto_or_asteroid.png
+    - moon.png
+    - dwarf_or_planet.png
+    - sun.svg
+    - mercury.svg
+    - venus.svg
+    - earth.svg
+    - mars.svg
+    - jupiter.svg
+    - saturn.svg
+    - uranus.svg
+    - neptune.svg
+  delegate_to: localhost
+
 - name: Fix app file permissions and start httpd in guest
   community.vmware.vmware_vm_shell:
     hostname: "{{ Target.vCenter.FQDN }}"
@@ -113,6 +168,8 @@
       -lc "chmod 600 /etc/httpd/conf/server.key &&
       chmod 644 /etc/httpd/conf/server.crt &&
       chmod 755 /etc/httpd/cgi-bin/app.py &&
+      chmod 755 /etc/httpd/html/icons &&
+      chmod 644 /etc/httpd/html/icons/* &&
       systemctl enable --now httpd"
     wait_for_process: true
     timeout: 1200
