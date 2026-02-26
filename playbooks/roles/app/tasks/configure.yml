@@ -143,15 +143,6 @@
     - pluto_or_asteroid.png
     - moon.png
     - dwarf_or_planet.png
-    - sun.svg
-    - mercury.svg
-    - venus.svg
-    - earth.svg
-    - mars.svg
-    - jupiter.svg
-    - saturn.svg
-    - uranus.svg
-    - neptune.svg
   delegate_to: localhost
 
 - name: Fix app file permissions and start httpd in guest

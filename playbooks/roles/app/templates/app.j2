@@ -83,7 +83,7 @@ def icon_data_uri_for_planet(name):
   try:
     with open(f"{ICON_BASE_PATH}/{filename}", "rb") as icon_file:
       encoded = base64.b64encode(icon_file.read()).decode("ascii")
-    mime = "image/png" if filename.lower().endswith(".png") else "image/svg+xml"
+    mime = "image/png"
     value = f"data:{mime};base64,{encoded}"
     icon_data_uri_cache[key] = value
     return value
