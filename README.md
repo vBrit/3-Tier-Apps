@@ -56,6 +56,35 @@ Role playbooks now run with `connection: local` and configure guests through VMw
 
 Because of this, `open-vm-tools` must be installed and running in guest VMs. The bootstrap playbook (`playbooks/configure_vms.yml`) now installs `open-vm-tools` and enables `vmtoolsd` before role execution.
 
+### DB changes (Planetary dataset)
+
+The DB role no longer uses the original sample `Rank/Name/Universe/Revenue` data.
+
+Current SQLite table (`planets`) in `playbooks/roles/db/files/clients.db` now contains:
+
+* `Planet`
+* `DistanceFromSunAU` (used for sorting)
+* `DistanceFromSunMiles`
+* `Moons`
+* `DiameterMiles`
+* `MoonDetails`
+* `StarDetails` (nearest stars to the Sun, shown under Sun)
+
+Runtime behavior:
+
+* Data is served by `playbooks/roles/db/files/data.py`.
+* App UI is rendered from `playbooks/roles/app/templates/app.j2`.
+* Planet rows are color-themed by planet.
+* Moon rows inherit their parent planet color.
+* Sun includes child rows for nearest stars (light-year values).
+
+To apply DB/content changes to deployed VMs without full redeploy:
+
+```bash
+ansible-playbook -i inventories/production/inventory.yml playbooks/install_config_db.yml
+ansible-playbook -i inventories/production/inventory.yml playbooks/install_config_app.yml
+```
+
 ### Playbooks
 
 ansible-playbook -i inventories/production/inventory.yml deploy.yml
