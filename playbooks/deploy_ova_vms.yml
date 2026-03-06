@@ -3,6 +3,8 @@
   become: no
   connection: local
   gather_facts: False
+  vars:
+    vm_folder_name: "{{ Target.vCenter.Folder | default('3-Tier-' ~ (NameSuffix | default('a'))) }}"
   pre_tasks:
     - import_tasks: tasks/resolve_target_vm_name.yml
   tasks:
@@ -13,7 +15,7 @@
         password: "{{ Common.Password.Physical }}"
         validate_certs: no
         datacenter_name: "{{ Target.vCenter.DataCenter }}"
-        folder_name: "{{ Target.vCenter.Folder | default('3-Tier') }}"
+        folder_name: "{{ vm_folder_name }}"
         folder_type: vm
         state: present
 
@@ -25,7 +27,7 @@
         validate_certs: no
         name: "{{ inventory_hostname }}" 
         datacenter: "{{ Target.vCenter.DataCenter }}"
-        folder: "/{{ Target.vCenter.DataCenter }}/vm/{{ Target.vCenter.Folder | default('3-Tier') }}"
+        folder: "/{{ Target.vCenter.DataCenter }}/vm/{{ vm_folder_name }}"
         cluster: "{{ Target.vCenter.Cluster }}"
         datastore: "{{ Target.vCenter.Datastore }}"
         disk_provisioning: thin
