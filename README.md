@@ -1,9 +1,41 @@
 # 3-Tier-Apps
 ![Overview Image](https://github.com/vBrit/3-Tier-Apps/blob/main/images/3-Tier.png)
+
 ## Overview
 
 This playbook will create a new 3 Tier Apps based on the 3-Tier Apps used in the HOL from VMWare. I created this to spin up quick 3-Tier apps to run 
 inside SDDC created using https://github.com/rutgerblom/SDDC.Lab/tree/dev-v3
+
+## How this works
+
+Deployment has three parts:
+
+1. **Render inventory aliases** from `Common.hostnames` (`playbooks/render_inventory.yml`).
+2. **Deploy/bootstrap VMs** in vCenter (`deploy.yml` playbooks).
+3. **Configure app/db/web roles** via VMware Guest Operations (no SSH role execution).
+
+The wrapper scripts run step 1 automatically before deploy/undeploy:
+
+```bash
+./deploy.sh
+./undeploy.sh
+```
+
+## Suffix-based naming model
+
+Set one value in `inventories/production/group_vars/all.yml`:
+
+```yaml
+NameSuffix: "b"
+```
+
+That suffix drives naming for:
+
+* Hostnames/VM names (for example `vpc-web-01b`, `vpc-app-01b`, `vpc-db-01b`)
+* NSX portgroups (for example `vpc-web-b`, `vpc-app-b`, `vpc-db-b`)
+* vCenter folder (`3-Tier-b`)
+
+Important: keep `NameSuffix` as a **top-level** variable (not under `Common`).
 
 ## Requirements
 
@@ -11,9 +43,9 @@ Ansible Controller - I used ubuntu 18
 
 Update `playbooks/deploy_ova_vms.yml` to point to the location of the Photon OS OVA on your Ansible controller (current default is Photon v5).
 
-NSX Segments named SEG-App, SEG-Web, SEG-DB (or change them via `Common.PortGroups` in `all.yml`).
+NSX Segments/PortGroups matching your values in `Common.PortGroups`.
 
-Edit the inventory/production/group_vars/all.yml and update 
+Edit `inventories/production/group_vars/all.yml` and update:
 
 Copy the template first:
 
@@ -24,6 +56,7 @@ cp inventories/production/group_vars/all.yml.template inventories/production/gro
 Do not commit `inventories/production/group_vars/all.yml` (local secrets/config only).
 
 * SiteCode - I used 21 and with my IPv4 the IP's used will be 10.225.21.11, 12, 13 for Web Servers, 10.225.22.10 App Server and 10.225.23.10 for DB Server.
+* NameSuffix (for example `a`, `b`, `c`)
 * Passwords
 * DNS - Not that its used but it may later
 * IPv4 - 10.225.
@@ -33,7 +66,7 @@ Do not commit `inventories/production/group_vars/all.yml` (local secrets/config 
 * Cluster
 * DataStore
 
-### Inventory variables
+### Variable notes
 
 PortGroups are now centralized in `inventories/production/group_vars/all.yml`:
 
@@ -47,6 +80,8 @@ Common:
 
 Group vars (`app.yml`, `db.yml`, `web.yml`) consume these values.
 
+If you omit `Target.vCenter.Folder`, deployment defaults to `3-Tier-<NameSuffix>`.
+
 ### Connection model (No SSH for role configuration)
 
 Role playbooks now run with `connection: local` and configure guests through VMware Guest Operations modules:
@@ -55,6 +90,31 @@ Role playbooks now run with `connection: local` and configure guests through VMw
 * `community.vmware.vmware_guest_file_operation`
 
 Because of this, `open-vm-tools` must be installed and running in guest VMs. The bootstrap playbook (`playbooks/configure_vms.yml`) now installs `open-vm-tools` and enables `vmtoolsd` before role execution.
+
+## Deploy and undeploy
+
+### Deploy (recommended)
+
+```bash
+./deploy.sh
+```
+
+What it does:
+
+1. `ansible-playbook -i localhost, playbooks/render_inventory.yml`
+2. `ansible-playbook -i inventories/production/inventory.yml deploy.yml`
+
+### Undeploy (recommended)
+
+```bash
+./undeploy.sh
+```
+
+What it does:
+
+1. Re-renders inventory aliases from your current suffix/hostnames.
+2. Removes matching VMs from vCenter.
+3. Cleans temporary rendered files in `playbooks/templates/*-hosts` and `*-10-static-eth0.network`.
 
 ### DB changes (Planetary dataset)
 
@@ -100,7 +160,11 @@ Or use wrappers that automatically render first:
 ./undeploy.sh
 ```
 
+Direct deploy (without wrapper):
+
+```bash
 ansible-playbook -i inventories/production/inventory.yml deploy.yml
+```
 
 ## Pre-requisite Steps
 

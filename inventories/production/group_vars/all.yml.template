@@ -1,24 +1,39 @@
+NameSuffix: "b"                                       # One-letter/environment suffix (for example: a, b, c)
+                                                       # Used for hostnames, NSX segments, and default vCenter folder naming.
+                                                       # Keep this as a top-level variable (do not nest under Common).
+
 Common:
-  SiteCode: 21                                        # 3rd octet segment selector used by host_vars math
+  SiteCode: 21                                        # 3rd octet selector used by IP math in inventory templates
   Password:
     Physical: "CHANGE_ME_VCENTER_PASSWORD"           # vCenter account password
-    VMs: "CHANGE_ME_VM_ROOT_PASSWORD"                # root password to set in deployed VMs
+    VMs: "CHANGE_ME_VM_ROOT_PASSWORD"                # root password configured inside deployed VMs
   DNS: "8.8.8.8"
-  Domain: "corp.local"                               # DNS search/domain suffix for hosts and cert SANs
+  Domain: "corp.local"                               # DNS suffix used in hosts entries and generated cert SANs
   BaseNetwork:
-    IPv4: '10.225'                                    # e.g. web hosts become 10.225.<SiteCode>.11/12/13
+    IPv4: '10.225'                                    # Base network prefix; final IPs are computed from SiteCode
     SubnetMask: 24
   PortGroups:
-    app: "SEG-App"
-    db: "SEG-DB"
-    web: "SEG-Web"
+    app: "vpc-app-{{ NameSuffix }}"                 # NSX segment/portgroup for app VM
+    db: "vpc-db-{{ NameSuffix }}"                   # NSX segment/portgroup for db VM
+    web: "vpc-web-{{ NameSuffix }}"                 # NSX segment/portgroup for web VMs
   hostnames:
-    app: "app-01b"                                 # Primary app hostname used by web proxy and certs
-    db: "db-01b"                                   # DB hostname used by app data endpoint
-    web:                                            # Web hostnames used in app access labels and web cert SANs
-      - "web-01b"
-      - "web-02b"
-      - "web-03b"
+    app: "vpc-app-01{{ NameSuffix }}"              # App VM name/hostname
+    db: "vpc-db-01{{ NameSuffix }}"                # DB VM name/hostname
+    web:                                            # Web VM names/hostnames (3-node web tier)
+      - "vpc-web-01{{ NameSuffix }}"
+      - "vpc-web-02{{ NameSuffix }}"
+      - "vpc-web-03{{ NameSuffix }}"
+  Infoblox:
+    portal:
+      url: "https://csp.infoblox.com"             # Infoblox Cloud Services Portal URL
+      key: "CHANGE_ME_INFOBLOX_PORTAL_KEY"
+    dns:
+      zone_fqdn: "corp.local"                      # Auth zone FQDN in Infoblox
+    record:
+      name: "test-host.corp.local"                 # Used by playbooks/test_infoblox_dns.yml
+      ipv4: "10.225.21.250"
+      comment: "Ansible Infoblox test"
+    cleanup_after_test: false
 
 Target:
   vCenter:
@@ -28,6 +43,6 @@ Target:
     DataCenter: DC01
     Cluster: Cluster01
     Datastore: datastore01
-    Folder: 3-Tier                                    # optional VM folder name (default: 3-Tier)
+    Folder: "3-Tier-{{ NameSuffix }}"               # Optional explicit folder. If omitted, deploy defaults to 3-Tier-<NameSuffix>
 
 ansible_python_interpreter: auto_silent
