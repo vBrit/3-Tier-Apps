@@ -1,0 +1,14 @@
+Begin /etc/hosts (network card version)    
+::1 localhost ipv6-localhost ipv6-loopback  
+127.0.0.1 localhost.localdomain  
+127.0.0.1 localhost  
+127.0.0.1 seg-app-01c
+
+# End /etc/hosts (network card version)  
+
+
+10.12.1.11  seg-web-01c.wei-lab.com seg-web-01c
+10.12.1.12  seg-web-02c.wei-lab.com seg-web-02c
+10.12.1.13  seg-web-03c.wei-lab.com seg-web-03c
+10.12.3.10  seg-db-01c.wei-lab.com seg-db-01c
+10.12.2.10  seg-app-01c.wei-lab.com seg-app-01c

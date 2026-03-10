@@ -1,2 +1,3 @@
 inventories/production/group_vars/all.yml
 .vscode/
+ansible-playbook.log

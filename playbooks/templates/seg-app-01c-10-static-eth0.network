@@ -1,0 +1,11 @@
+[Match]  
+Name=eth0    
+
+[Network]  
+Address=10.12.2.10/24
+Gateway=10.12.2.1
+DNS=8.8.8.8
+Domains=wei-lab.com
+
+
+
