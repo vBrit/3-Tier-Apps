@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: three-tier-web
+  namespace: three-tier-app
+  annotations:
+    kubernetes.io/ingress.class: contour
+spec:
+  rules:
+    - host: three-tier.wei-lab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: three-tier-web
+                port:
+                  number: 80

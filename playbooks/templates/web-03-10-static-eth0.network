@@ -1,0 +1,11 @@
+[Match]  
+Name=eth0    
+
+[Network]  
+Address=10.226.56.13/24
+Gateway=10.226.56.1
+DNS=10.11.92.23
+Domains=sddc.lab
+
+
+

@@ -1,0 +1,14 @@
+Begin /etc/hosts (network card version)    
+::1 localhost ipv6-localhost ipv6-loopback  
+127.0.0.1 localhost.localdomain  
+127.0.0.1 localhost  
+127.0.0.1 web-01
+
+# End /etc/hosts (network card version)  
+
+
+10.226.56.11  web-01.sddc.lab web-01
+10.226.56.12  web-02.sddc.lab web-02
+10.226.56.13  web-03.sddc.lab web-03
+10.226.58.10  db-01.sddc.lab db-01
+10.226.57.10  app-01.sddc.lab app-01

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: three-tier-db
+  namespace: three-tier-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: three-tier-db
+  template:
+    metadata:
+      labels:
+        app: three-tier-db
+    spec:
+      containers:
+        - name: db
+          image: ghcr.io/your-org/three-tier-db:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_FILE
+              value: /var/lib/three-tier-db/clients.db
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/three-tier-db
+      volumes:
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: three-tier-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: three-tier-db
+  namespace: three-tier-app
+spec:
+  selector:
+    app: three-tier-db
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

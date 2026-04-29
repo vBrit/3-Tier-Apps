@@ -3,23 +3,23 @@ all:
   children:
     web:
       hosts:
-        seg-web-01c:
+        web-01:
           ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.11"
           ansible_python_interpreter: /usr/bin/python3
-        seg-web-02c:
+        web-02:
           ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.12"
           ansible_python_interpreter: /usr/bin/python3
-        seg-web-03c:
+        web-03:
           ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode }}.13"
           ansible_python_interpreter: /usr/bin/python3
     db:
       hosts:
-        seg-db-01c:
+        db-01:
           ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode + 2 }}.10"
           ansible_python_interpreter: /usr/bin/python3
     app:
       hosts:
-        seg-app-01c:
+        app-01:
           ansible_host: "{{ Common.BaseNetwork.IPv4 }}.{{ Common.SiteCode + 1 }}.10"
           ansible_python_interpreter: /usr/bin/python3
   vars:

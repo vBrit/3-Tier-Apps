@@ -6,6 +6,16 @@
 This playbook will create a new 3 Tier Apps based on the 3-Tier Apps used in the HOL from VMWare. I created this to spin up quick 3-Tier apps to run 
 inside SDDC created using https://github.com/rutgerblom/SDDC.Lab/tree/dev-v3
 
+## Container deployment (Tanzu)
+
+This repo now includes an additive container path alongside the existing VM-based Ansible flow.
+
+- Container build assets are in `containers/`.
+- Kubernetes manifests are in `k8s/base/`.
+- Quick-start instructions are in `k8s/README.md`.
+
+The original VM deployment workflow (`deploy.sh` / `deploy.yml`) is unchanged.
+
 ## How this works
 
 Deployment has three parts:
